@@ -1,14 +1,11 @@
 import {
-  type MarkdownView,
-  type App,
   type Editor,
   type TFile,
-  type WorkspaceLeaf,
   Notice,
 } from "obsidian";
 import type { MediaView } from "@/media-view/view-type";
 import type MxPlugin from "@/mx-main";
-import { byActiveTime } from "../leaf-open";
+import { getMostRecentEditorLeaf } from "../active-editor";
 import {
   copyScreenshot,
   saveScreenshot,
@@ -171,20 +168,4 @@ export function registerNoteCommands(plugin: MxPlugin) {
       },
     };
   }
-}
-
-function getMostRecentEditorLeaf(app: App) {
-  const leaf = app.workspace
-    .getLeavesOfType("markdown")
-    .filter((l) => {
-      const view = l.view as MarkdownView;
-      return view.file && view.getMode() === "source";
-    })
-    .sort(byActiveTime);
-
-  return (
-    (leaf[0] as
-      | (WorkspaceLeaf & { view: MarkdownView & { file: TFile } })
-      | undefined) ?? null
-  );
 }

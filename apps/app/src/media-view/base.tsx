@@ -17,7 +17,7 @@ import { takeTimestamp } from "@/media-note/timestamp/timestamp";
 import type MediaExtended from "@/mx-main";
 import type { MediaInfo } from "../info/media-info";
 import { noticeNotetaking } from "./notice-notetaking";
-import { importIosSystemScreenshot } from "./ios-screenshot";
+import { importMobileSystemScreenshot } from "./mobile-screenshot";
 import {
   isRemoteMediaViewType,
   screenshotAllowed,
@@ -76,9 +76,12 @@ export function addAction(player: PlayerComponent & ItemView) {
         .then((note) => plugin.leafOpener.openNote(note))
         .then((ctx) => saveScreenshot(player, ctx));
     });
-  if (Platform.isIosApp && isRemoteMediaViewType(viewType)) {
-    player.addAction("crop", "导入并裁剪 iPad 系统截图", () =>
-      importIosSystemScreenshot(player),
+  if (
+    (Platform.isIosApp || Platform.isAndroidApp) &&
+    isRemoteMediaViewType(viewType)
+  ) {
+    player.addAction("crop", "导入并裁剪系统截图", () =>
+      importMobileSystemScreenshot(player),
     );
   }
 }

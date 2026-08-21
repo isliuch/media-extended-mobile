@@ -6,6 +6,7 @@ import {
   type ScreenshotCropTarget,
 } from "@/lib/imported-screenshot";
 import type { ScreenshotInfo } from "@/lib/screenshot";
+import { getMostRecentEditorLeaf } from "@/media-note/active-editor";
 import { saveScreenshotInfo } from "@/media-note/timestamp/screenshot";
 import type { PlayerComponent } from "./base";
 
@@ -14,10 +15,10 @@ interface ScreenshotSelection {
   time: number;
 }
 
-class IosScreenshotImportModal extends Modal {
+class MobileScreenshotImportModal extends Modal {
   static run(app: App, defaultTime = ""): Promise<ScreenshotSelection | null> {
     return new Promise((resolve) => {
-      const modal = new IosScreenshotImportModal(app, defaultTime, resolve);
+      const modal = new MobileScreenshotImportModal(app, defaultTime, resolve);
       modal.open();
     });
   }
@@ -33,7 +34,9 @@ class IosScreenshotImportModal extends Modal {
   }
 
   onOpen() {
-    this.titleEl.setText("导入 iPad 系统截图");
+    this.titleEl.setText(
+      Platform.isIosApp ? "导入 iPad 系统截图" : "导入 Android 系统截图",
+    );
     this.contentEl.createEl("p", {
       text: "请先暂停视频并完成系统截图，再选择刚刚保存的截图。插件会自动裁剪播放器区域并插入媒体笔记。",
     });
@@ -61,13 +64,21 @@ class IosScreenshotImportModal extends Modal {
     fileInput.style.display = "block";
     fileInput.style.width = "100%";
 
-    form.createEl("button", {
+    const autoImportLabel = form.createEl("label");
+    autoImportLabel.style.display = "block";
+    const autoImportInput = autoImportLabel.createEl("input", {
+      type: "checkbox",
+      attr: { name: "auto-import" },
+    });
+    autoImportInput.checked = true;
+    autoImportLabel.appendText(" 选择图片后自动导入");
+
+    const submitButton = form.createEl("button", {
       text: "导入并裁剪",
       attr: { type: "submit" },
     });
 
-    form.onsubmit = (event) => {
-      event.preventDefault();
+    const submitSelection = () => {
       const file = fileInput.files?.[0];
       if (!file) {
         new Notice("请选择刚刚生成的系统截图");
@@ -81,6 +92,18 @@ class IosScreenshotImportModal extends Modal {
       this.resolved = true;
       this.resolve({ file, time });
       this.close();
+    };
+
+    fileInput.onchange = () => {
+      if (autoImportInput.checked) submitSelection();
+    };
+    autoImportInput.onchange = () => {
+      submitButton.style.display = autoImportInput.checked ? "none" : "";
+    };
+    submitButton.style.display = "none";
+    form.onsubmit = (event) => {
+      event.preventDefault();
+      submitSelection();
     };
   }
 
@@ -179,7 +202,7 @@ async function cropScreenshot(
   };
 }
 
-export async function importIosSystemScreenshot(
+export async function importMobileSystemScreenshot(
   view: PlayerComponent & ItemView,
 ) {
   const media = view.getMediaInfo();
@@ -192,9 +215,14 @@ export async function importIosSystemScreenshot(
     new Notice("没有找到可裁剪的移动播放器");
     return;
   }
+  const targetNote = getMostRecentEditorLeaf(view.app);
+  if (!targetNote) {
+    new Notice("请先打开并聚焦一个可编辑的笔记标签页");
+    return;
+  }
 
   const initialTime = isFileMediaInfo(media) ? undefined : media.tempFrag?.start;
-  const selection = await IosScreenshotImportModal.run(
+  const selection = await MobileScreenshotImportModal.run(
     view.app,
     initialTime && initialTime > 0 ? String(Math.floor(initialTime)) : "",
   );
@@ -209,11 +237,20 @@ export async function importIosSystemScreenshot(
       settings.screenshotFormat,
       settings.screenshotQuality,
     );
-    const note = await view.plugin.mediaNote.getNote(media, null);
-    const context = await view.plugin.leafOpener.openNote(note);
-    await saveScreenshotInfo(view, context, screenshot);
+    const previousActiveDocument = window.activeDocument;
+    window.activeDocument = targetNote.containerEl.doc;
+    try {
+      await saveScreenshotInfo(
+        view,
+        { file: targetNote.view.file, editor: targetNote.view.editor },
+        screenshot,
+      );
+      new Notice(`截图已插入“${targetNote.view.file.basename}”`);
+    } finally {
+      window.activeDocument = previousActiveDocument;
+    }
   } catch (error) {
-    console.error("Failed to import iOS system screenshot", error);
+    console.error("Failed to import mobile system screenshot", error);
     new Notice(
       "导入系统截图失败：" +
         (error instanceof Error ? error.message : String(error)),

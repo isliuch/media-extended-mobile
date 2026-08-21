@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.4] - 2026-08-22
+
+### Added
+
+- Extended system-screenshot importing and automatic player-area cropping to Android.
+- Added an enabled-by-default “import automatically after selecting an image” option. With it enabled, selecting the screenshot immediately starts cropping, saving, and inserting it without another button press.
+
+### Changed
+
+- Imported screenshots are inserted into the most recently focused editable Markdown tab. The import action no longer creates or opens a media note.
+
 ## [3.3.0-mobile.3] - 2026-08-22
 
 ### Added
