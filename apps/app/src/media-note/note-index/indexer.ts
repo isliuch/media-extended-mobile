@@ -138,10 +138,9 @@ export class MediaNoteIndex extends Component {
     player: MediaPlayerInstance | null,
   ): Promise<TFile> {
     const { metadataCache } = this.app;
-    if (!player) {
-      throw new Error("Player not initialized");
-    }
-    const title = mediaTitle(mediaInfo, { state: player.state });
+    const title = mediaTitle(mediaInfo, {
+      state: player?.state,
+    });
     if (isFileMediaInfo(mediaInfo)) {
       const mediaType = checkMediaType(mediaInfo.file.extension)!;
       const file = mediaInfo.file;

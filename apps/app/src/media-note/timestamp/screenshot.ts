@@ -11,10 +11,11 @@ import { getSaveFolder } from "@/lib/folder";
 import { formatDuration, toDurationISOString } from "@/lib/hash/format";
 import { normalizeFilename } from "@/lib/norm";
 import type { WebiviewMediaProvider } from "@/lib/remote-player/provider";
+import type { ScreenshotInfo } from "@/lib/screenshot";
 import type { PlayerComponent } from "@/media-view/base";
 import type { MxSettings } from "@/settings/def";
 import { mediaTitle } from "../title";
-import { timestampGenerator, insertTimestamp } from "./utils";
+import { insertTimestamp, timestampGenerator } from "./utils";
 
 interface Player {
   media: MediaInfo;
@@ -60,24 +61,49 @@ export async function saveScreenshot<T extends PlayerComponent>(
   const {
     provider,
     state,
-    media,
-    app: { fileManager, vault },
     settings: {
-      insertBefore,
-      screenshotTemplate,
-      screenshotEmbedTemplate,
       screenshotQuality,
       screenshotFormat,
-      screenshotFolderPath,
     },
   } = result;
 
-  const { blob, time } = await takeScreenshot(
+  const screenshot = await takeScreenshot(
     provider,
     screenshotFormat,
     screenshotQuality,
   );
-  const genTimestamp = timestampGenerator(time, media, result);
+  return await saveScreenshotInfo(
+    playerComponent,
+    { file: newNote, editor },
+    screenshot,
+    state,
+  );
+}
+
+export async function saveScreenshotInfo<T extends PlayerComponent>(
+  playerComponent: T,
+  { file: newNote, editor }: { file: TFile; editor: Editor },
+  { blob, time }: ScreenshotInfo,
+  state?: Readonly<MediaPlayerState>,
+): Promise<boolean> {
+  const media = playerComponent.getMediaInfo();
+  if (!media) {
+    new Notice("No media is opened");
+    return false;
+  }
+  const { fileManager, vault } = playerComponent.plugin.app;
+  const settings = playerComponent.plugin.settings.getState();
+  const {
+    insertBefore,
+    screenshotTemplate,
+    screenshotEmbedTemplate,
+    screenshotFolderPath,
+  } = settings;
+  const genTimestamp = timestampGenerator(time, media, {
+    app: playerComponent.plugin.app,
+    settings,
+    duration: state?.duration,
+  });
 
   const ext = mime.getExtension(blob.type);
   if (!ext) {

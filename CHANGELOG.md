@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.3] - 2026-08-22
+
+### Added
+
+- Added a separate iOS action for importing a system screenshot, automatically cropping it to the visible YouTube or Bilibili player, and inserting it into the media note. The existing player screenshot action remains unchanged.
+
 ## [3.3.0-mobile.2] - 2026-08-22
 
 ### Added

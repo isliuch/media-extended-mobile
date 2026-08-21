@@ -1,5 +1,11 @@
 import type { MediaPlayerInstance } from "@vidstack/react";
-import { type Component, type Menu, type View, type ItemView } from "obsidian";
+import {
+  type Component,
+  type Menu,
+  Platform,
+  type View,
+  type ItemView,
+} from "obsidian";
 import type ReactDOM from "react-dom/client";
 import type { MediaViewStoreApi } from "@/components/context";
 import { dedupeWebsiteTrack } from "@/components/use-tracks";
@@ -11,7 +17,12 @@ import { takeTimestamp } from "@/media-note/timestamp/timestamp";
 import type MediaExtended from "@/mx-main";
 import type { MediaInfo } from "../info/media-info";
 import { noticeNotetaking } from "./notice-notetaking";
-import { screenshotAllowed, type MediaViewType } from "./view-type";
+import { importIosSystemScreenshot } from "./ios-screenshot";
+import {
+  isRemoteMediaViewType,
+  screenshotAllowed,
+  type MediaViewType,
+} from "./view-type";
 
 export interface PlayerComponent extends Component {
   plugin: MediaExtended;
@@ -65,6 +76,11 @@ export function addAction(player: PlayerComponent & ItemView) {
         .then((note) => plugin.leafOpener.openNote(note))
         .then((ctx) => saveScreenshot(player, ctx));
     });
+  if (Platform.isIosApp && isRemoteMediaViewType(viewType)) {
+    player.addAction("crop", "导入并裁剪 iPad 系统截图", () =>
+      importIosSystemScreenshot(player),
+    );
+  }
 }
 
 export function onPaneMenu<

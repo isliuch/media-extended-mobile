@@ -19,8 +19,8 @@ Media Extended 的可维护移动端分支，基于上游最后一个 MIT 开源
 
 ### 已知限制
 
-- YouTube 与哔哩哔哩移动端 iframe 暂不接入 Media Extended 的播放控制、时间戳读取和截图。
-- iframe 视频画面受浏览器同源策略保护。Obsidian Mobile 没有 Electron `webContents` 或官方截图 API，因此插件目前无法获取精确视频帧。
+- YouTube 与哔哩哔哩移动端 iframe 暂不接入 Media Extended 的播放控制和自动时间戳读取。
+- iframe 视频画面受浏览器同源策略保护。iOS 上可先使用系统截图，再点击新增的“导入并裁剪 iPad 系统截图”按钮；插件会选择图片、裁剪当前播放器区域并插入媒体笔记。原有相机截图按钮保持不变。
 - B 站短链 `b23.tv` 需要先展开成完整链接。
 - 桌面端继续使用原有 Electron 网页播放器能力。
 
@@ -60,7 +60,8 @@ pnpm prepare:release
 
 - [x] **Mobile installation and basic playback** 📱
 - [ ] **Bilibili playback state and timestamp bridge**
-- [ ] **A consent-based mobile screenshot bridge, if Obsidian exposes a supported API**
+- [x] **iOS system screenshot import and automatic player-area cropping**
+- [ ] **A direct mobile screenshot bridge, if Obsidian exposes a supported API**
 - [ ] **Metadata and Subtitle Extraction** 📊: Pull metadata and subtitles directly from YouTube and Bilibili.
 
 - [ ] **Canvas Support** 🎨: Get creative with how you integrate and display media within your notes.

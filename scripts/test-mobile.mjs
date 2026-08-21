@@ -1,4 +1,8 @@
 import assert from "node:assert/strict";
+import {
+  calculateScreenshotCrop,
+  parseScreenshotTime,
+} from "../apps/app/src/lib/imported-screenshot.ts";
 import { buildBilibiliEmbedUrl } from "../apps/app/src/web/url-match/bilibili-embed.ts";
 import { buildYouTubeEmbedUrl } from "../apps/app/src/web/url-match/youtube-embed.ts";
 
@@ -45,4 +49,27 @@ assert.equal(youtube.searchParams.get("start"), "12");
 assert.equal(youtube.searchParams.get("end"), "45");
 assert.equal(youtube.searchParams.get("playsinline"), "1");
 
-console.log("Mobile embed URL tests passed");
+assert.equal(parseScreenshotTime(""), 0);
+assert.equal(parseScreenshotTime("83"), 83);
+assert.equal(parseScreenshotTime("1:23"), 83);
+assert.equal(parseScreenshotTime("1:02:03"), 3723);
+assert.equal(parseScreenshotTime("1:70"), null);
+assert.equal(parseScreenshotTime("invalid"), null);
+
+assert.deepEqual(
+  calculateScreenshotCrop(
+    {
+      left: 10,
+      top: 20,
+      width: 100,
+      height: 50,
+      viewportWidth: 200,
+      viewportHeight: 400,
+    },
+    1000,
+    2000,
+  ),
+  { x: 50, y: 100, width: 500, height: 250 },
+);
+
+console.log("Mobile embed URL and imported screenshot tests passed");
