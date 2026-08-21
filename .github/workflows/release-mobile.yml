@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --filter ./apps/app...
+      - run: pnpm install --frozen-lockfile --filter "{./apps/app}..."
       - run: pnpm --filter ./apps/app type-check
       - run: pnpm test:mobile
       - run: pnpm --filter ./apps/app build

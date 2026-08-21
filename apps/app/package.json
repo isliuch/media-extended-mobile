@@ -3,13 +3,15 @@
   "type": "module",
   "version": "3.3.0-mobile.1",
   "scripts": {
+    "build:dependencies": "pnpm --filter @codemirror/language prepare",
+    "prebuild": "pnpm run build:dependencies",
     "dev": "cross-env BUILD=development node esbuild.config.mjs",
     "build": "tsc --build && cross-env BUILD=production node esbuild.config.mjs",
+    "pretype-check": "pnpm run build:dependencies",
     "type-check": "tsc --build",
     "lint": "eslint src/ --ext .ts,.tsx --fix"
   },
   "devDependencies": {
-    "@codemirror/language": "../../packages/cm-language",
     "@codemirror/state": "^6.0.0",
     "@codemirror/view": "^6.0.0",
     "@electron/remote": "^2.1.1",
@@ -42,6 +44,7 @@
     "typescript": "~5.1.6"
   },
   "dependencies": {
+    "@codemirror/language": "workspace:*",
     "@floating-ui/react-dom": "^2.0.8",
     "@radix-ui/primitive": "^1.0.1",
     "@radix-ui/react-arrow": "1.0.3",

@@ -6,8 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-- Renamed the plugin ID to `media-extended-mobile` and the display name to Media Extended Mobile so it can coexist with the original plugin.
-
 ## [3.3.0-mobile.1] - 2026-08-21
 
 ### Added
@@ -18,9 +16,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Renamed the plugin ID to `media-extended-mobile` and the display name to Media Extended Mobile so it can coexist with the original plugin.
 - Replaced top-level Node `path` and `url` dependencies with mobile-safe implementations.
 - Disabled the Electron-only login command on mobile.
 - Marked the plugin as mobile-compatible in every release manifest.
+
+### Fixed
+
+- Build the vendored `@codemirror/language` package before type-checking or bundling, so releases succeed in a clean GitHub Actions environment.
 
 ### Known limitations
 

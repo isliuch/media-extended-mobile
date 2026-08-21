@@ -14,6 +14,9 @@ importers:
 
   apps/app:
     dependencies:
+      '@codemirror/language':
+        specifier: workspace:*
+        version: link:../../packages/cm-language
       '@floating-ui/react-dom':
         specifier: ^2.0.8
         version: 2.0.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -174,9 +177,6 @@ importers:
         specifier: ^4.4.7
         version: 4.5.0(@types/react@18.2.48)(react@18.2.0)
     devDependencies:
-      '@codemirror/language':
-        specifier: ../../packages/cm-language
-        version: link:../../packages/cm-language
       '@codemirror/state':
         specifier: ^6.0.0
         version: 6.4.0
