@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.1] - 2026-08-21
+
+### Added
+
+- Rebased the maintainable mobile fork on the upstream MIT-licensed v3.2.6 source.
+- Added basic Bilibili playback on Obsidian Mobile through the official iframe player, including BV/av/ep/ss links, multi-part page selection, and link start time.
+- Added a reproducible BRAT release workflow and generated release assets.
+
+### Changed
+
+- Replaced top-level Node `path` and `url` dependencies with mobile-safe implementations.
+- Disabled the Electron-only login command on mobile.
+- Marked the plugin as mobile-compatible in every release manifest.
+
+### Known limitations
+
+- Cross-origin YouTube and Bilibili iframe frames cannot be captured by an Obsidian Mobile plugin without a supported native screenshot bridge.
+- The mobile Bilibili iframe does not yet expose playback state to Media Extended timestamp commands.
+
 ## [4.2.7] - 2026-06-07
 
 ### Fixed

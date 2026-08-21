@@ -1,11 +1,22 @@
 {
-  "name": "@mx/public",
-  "type": "module",
-  "private": true,
-  "exports": {
-    "./manifest.json": "./manifest.json",
-    "./manifest-beta.json": "./manifest-beta.json",
-    "./versions.json": "./versions.json",
-    "./package.json": "./package.json"
+  "name": "media-extended",
+  "description": "",
+  "packageManager": "pnpm@9.15.9",
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "scripts": {
+    "audit:mobile": "node scripts/audit-mobile-bundle.mjs",
+    "build": "turbo run build",
+    "build:plugin": "pnpm --filter ./apps/app build",
+    "dev": "turbo run dev",
+    "prepare:release": "node scripts/prepare-release.mjs",
+    "test:mobile": "node --experimental-strip-types scripts/test-mobile.mjs",
+    "type-check": "pnpm --filter ./apps/app type-check"
+  },
+  "pnpm": {
+    "neverBuiltDependencies": [
+      "electron"
+    ]
   }
 }

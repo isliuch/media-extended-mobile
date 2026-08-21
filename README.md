@@ -1,66 +1,70 @@
-<div align="center">
-  <h1>Media Extended</h1>
-  <strong>A Media Integration Plugin for Obsidian</strong>
-  <p>Transform your Obsidian into a powerful video note-taking tool.</p>
-  <p>
-    <a href="https://mx.aidenlx.site">📖 Website</a>
-    ·
-    <a href="https://mx.aidenlx.site/docs/v4">🚀 Getting Started</a>
-    ·
-    <a href="https://mx.aidenlx.site/community">💬 Community</a>
-  </p>
-</div>
+# Media Extended Mobile
 
-> [!WARNING]
-> **License Change:** 
-> Future releases of v4 will be **closed source**.
-> The original codebase up to version 3 remains open source under the MIT license and can be found in the [`v3` branch](https://github.com/aidenlx/media-extended/tree/v3).
-> For details, see [v4 release notes](https://mx.aidenlx.site/blog/v4-release#license-change)
+Media Extended 的可维护移动端分支，基于上游最后一个 MIT 开源版本 v3.2.6。
 
-![Media Extended plugin with player and media note](./assets/first-note.png)
+![Media Extended plugin with player and media note](./first-note.jpg)
 
-## Overview
+本分支不修改或重新发布闭源的 Media Extended v4 产物。它保留 v3 的视频笔记、时间戳、字幕和本地媒体功能，并逐步替换移动端不存在的 Node.js/Electron API。
 
-Media Extended is a plugin that integrates media playback and management into Obsidian. Whether you're a student, researcher, or content creator, this plugin makes it easier to incorporate, control, and reference audio and video materials directly within your digital notebook, preserving Obsidian's philosophy of plain-text, future-proof note-taking.
+## 当前移动端状态
 
-## ⭐ Key Features
+- 插件清单已允许 Obsidian Mobile 正常安装，无需 BRAT 的“不兼容插件”开关。
+- 模块初始化不再在移动端加载 Node `path`/`url` API。
+- YouTube、Vimeo 使用 iframe 播放器。
+- 哔哩哔哩 BV、av、ep、ss 完整链接在移动端使用官方嵌入播放器；支持分 P 和链接中的起始时间。
+- 本地仓库媒体继续使用 Obsidian 的资源 URL 播放。
 
-| Feature | Description |
-| --- | --- |
-| **Broad Media Support** | Open and play local media files, remote URLs, and videos from services like YouTube and Vimeo directly in Obsidian. |
-| **Advanced Playback Control** | Control playback with global hotkeys without leaving your notes. Pin a player to avoid tab clutter. |
-| **Timestamped Notes** | Insert links to specific moments in your media with a single click or command. Clicking the timestamp jumps to the exact moment. |
-| **Screenshot Capture** | Capture screenshots from videos, with options to crop, and embed them in your notes with a timestamp link back to the source. |
-| **Interactive Transcripts** | Link transcripts (`.srt`, `.vtt`) to your media. Click to navigate, search the full text, and copy timestamped quotes. |
-| **Live Recording Timestamps** | While using Obsidian's audio recorder, drop timestamp markers into your notes that automatically become clickable links when the recording is saved. |
-| **Customizable Templates** | Tailor the format of inserted timestamps and screenshot links to fit your personal note-taking workflow. |
-| **Powerful Linking** | Create media links and embeds with fragments for start/end times (`#t=...`), looping, and auto-play for precise control. |
+### 已知限制
 
-## 📋 Disclosures
+- 哔哩哔哩移动端 iframe 暂不接入 Media Extended 的播放控制、时间戳读取和截图。
+- YouTube iframe 的视频画面受浏览器同源策略保护。Obsidian Mobile 没有 Electron `webContents` 或官方截图 API，因此插件目前无法获取精确视频帧；时间戳和普通播放仍可使用。
+- B 站短链 `b23.tv` 需要先展开成完整链接。
+- 桌面端继续使用原有 Electron 网页播放器能力。
 
-> [!IMPORTANT]
-> **File System Access**
-> This plugin may access files outside of Obsidian vaults when you store media files on external drives, portable disks, or cloud storage services like OneDrive. This access is necessary to play media files that aren't stored directly within your vault.
+## 安装
 
-> [!IMPORTANT]  
-> **Network Access**
-> This plugin requires network access to stream media from online services (YouTube, Vimeo, etc.) and to connect to hosted WebDAV services for remote media storage. Network connections are only made to services you explicitly configure or link to.
+BRAT 1.1.0 及以上版本从 GitHub Release 安装插件。把本仓库地址加入 BRAT，选择最新的 `*-mobile.*` 预发布版本即可。Release 必须包含 `main.js`、`manifest.json` 和 `styles.css`。
 
-## 🚀 Quick Start
+测试链接：
 
-**Try it now:** With Media Extended installed, copy the URL below and paste it into your browser's address bar to open Steve Jobs' 
-2005 Stanford 
-Commencement Address directly in Obsidian.
-
-```txt
-obsidian://mx-open?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DUF8uR6Z6KLc
+```text
+obsidian://mx-open/https://www.youtube.com/watch?v=jNQXAC9IVRw
+obsidian://mx-open/https://www.bilibili.com/video/BV1xx411c7mD
 ```
 
-For detailed guides, please refer to the [**Documentation**](https://mx.aidenlx.site/docs/v4).
+## 开发与发布
 
-## 🆘 Support
+```bash
+corepack pnpm@9.15.9 install --frozen-lockfile
+pnpm type-check
+pnpm build:plugin
+pnpm prepare:release
+```
 
-If you have questions or issues about the plugin, please post them to our community: <https://mx.aidenlx.site/community>
+推送与 `manifest.json` 版本一致的 `*-mobile.*` 标签后，GitHub Actions 会构建并创建 BRAT 可识别的预发布版本。
 
-For bug reports, use the GitHub Discussions Q&A category: <https://github.com/aidenlx/media-extended/discussions/categories/q-a>
+## Features 🌟
 
+- **Seamless Integration with Obsidian** 🤝: Works perfectly with Obsidian's live preview and multi-window support, ensuring a smooth workflow.
+- **Embed Multimedia Files** 📁: Easily embed both local or hosted video and audio files directly into your notes, bringing your content to life.
+- **Playback Control** ⏯️: Utilize commands and keyboard shortcuts for efficient playback control, including play, pause, skip, and timestamping for quick references.
+- **Support for Multiple Video Platforms** 🌐: Enjoy support for popular platforms like YouTube, Vimeo, Coursera, Bilibili, and more. If it can be played in a web browser, it can be embedded in your notes.
+- **Local Subtitle Support** 📑: Enhance your media with local subtitle files in SRT, VTT, and ASS formats, making it easier to follow along or understand content in another language.
+- **Media Fragments** 🎞️: Create media fragments that play only within a specified range, perfect for focusing on specific parts of a lecture or presentation.
+- **Playlist Support** 📋: Organize your media files into playlists for continuous playback.
+
+## 后续计划
+
+- [x] **Mobile installation and basic playback** 📱
+- [ ] **Bilibili playback state and timestamp bridge**
+- [ ] **A consent-based mobile screenshot bridge, if Obsidian exposes a supported API**
+- [ ] **Metadata and Subtitle Extraction** 📊: Pull metadata and subtitles directly from YouTube and Bilibili.
+
+- [ ] **Canvas Support** 🎨: Get creative with how you integrate and display media within your notes.
+- [ ] (Paid Features) **AI Summary for Transcript** 🤖: Get concise summaries of your media's content.
+- [ ] (Paid Features) **Table/Text OCR for Screenshots** 📷: Extract text from images for easy reference and integration.
+- [ ] (Paid Features) **Transcript Generation from Video** 📝: Automatically generate text transcripts from your video content.
+
+## Special Thanks
+
+A special thanks to [bfcs](https://github.com/bfcs) for their valuable contributions. They have helped fix issues during a long period of inactivity and made attempts to implement YouTube transcript functionality!
