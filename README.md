@@ -2,6 +2,8 @@
 
 Media Extended 的可维护移动端分支，基于上游最后一个 MIT 开源版本 v3.2.6。
 
+插件 ID 为 `media-extended-mobile`，显示名为 **Media Extended Mobile**，可与原版 Media Extended 同时安装。
+
 ![Media Extended plugin with player and media note](./first-note.jpg)
 
 本分支不修改或重新发布闭源的 Media Extended v4 产物。它保留 v3 的视频笔记、时间戳、字幕和本地媒体功能，并逐步替换移动端不存在的 Node.js/Electron API。

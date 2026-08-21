@@ -16,5 +16,5 @@ export const require = (<M extends Record<string, Record<string, any>>>(
     if (e in modules) return modules[e];
     throw new Error(`Module not found: ${e.toString()}`);
   })({
-  "media-extended": pluginExports,
+  "media-extended-mobile": pluginExports,
 });

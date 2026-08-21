@@ -1,5 +1,5 @@
 {
-  "name": "media-extended",
+  "name": "media-extended-mobile",
   "description": "",
   "packageManager": "pnpm@9.15.9",
   "devDependencies": {

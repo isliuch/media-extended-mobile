@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- Renamed the plugin ID to `media-extended-mobile` and the display name to Media Extended Mobile so it can coexist with the original plugin.
+
 ## [3.3.0-mobile.1] - 2026-08-21
 
 ### Added

@@ -87,7 +87,7 @@ const opts = {
     obPlugin({ beta: isPreRelease() }),
     inlineCodePlugin(
       {
-        external: ['media-extended', 'fs/promises', 'electron', 'path'],
+        external: ['media-extended-mobile', 'fs/promises', 'electron', 'path'],
         ...(isProd ? { drop: ["console"], } : {})
       }
     ),
