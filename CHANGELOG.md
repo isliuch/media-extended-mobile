@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.2] - 2026-08-22
+
+### Added
+
+- Added a dedicated YouTube iframe player for Obsidian Mobile.
+
+### Fixed
+
+- Kept mobile iframe players at an inline 16:9 size instead of filling the entire media pane.
+- Added an Android 8 and older fallback to Bilibili's legacy official mobile player for regular BV/av videos.
+- Added `playsinline` parameters to reduce forced fullscreen playback on mobile WebViews.
+
 ## [3.3.0-mobile.1] - 2026-08-21
 
 ### Added

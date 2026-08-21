@@ -9,7 +9,10 @@ import {
   onPlayerMounted,
 } from "@/components/context";
 import { Player } from "@/components/player";
-import { MobileBilibiliPlayer } from "@/components/mobile-bilibili";
+import {
+  MobileBilibiliPlayer,
+  MobileYouTubePlayer,
+} from "@/components/mobile-bilibili";
 import { isFileMediaInfo } from "@/info/media-info";
 import { MediaURL } from "@/info/media-url";
 import { MediaHost } from "@/info/supported";
@@ -165,6 +168,10 @@ export abstract class MediaRemoteView
       Platform.isMobile &&
       media instanceof MediaURL &&
       media.type === MediaHost.Bilibili;
+    const mobileYouTube =
+      Platform.isMobile &&
+      media instanceof MediaURL &&
+      media.type === MediaHost.YouTube;
     this.root.render(
       <MediaViewContext.Provider
         value={{
@@ -178,7 +185,13 @@ export abstract class MediaRemoteView
           embed: false,
         }}
       >
-        {mobileBilibili ? <MobileBilibiliPlayer media={media} /> : <Player />}
+        {mobileBilibili ? (
+          <MobileBilibiliPlayer media={media} />
+        ) : mobileYouTube ? (
+          <MobileYouTubePlayer media={media} />
+        ) : (
+          <Player />
+        )}
       </MediaViewContext.Provider>,
     );
   }

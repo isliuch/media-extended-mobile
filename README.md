@@ -12,14 +12,15 @@ Media Extended 的可维护移动端分支，基于上游最后一个 MIT 开源
 
 - 插件清单已允许 Obsidian Mobile 正常安装，无需 BRAT 的“不兼容插件”开关。
 - 模块初始化不再在移动端加载 Node `path`/`url` API。
-- YouTube、Vimeo 使用 iframe 播放器。
-- 哔哩哔哩 BV、av、ep、ss 完整链接在移动端使用官方嵌入播放器；支持分 P 和链接中的起始时间。
+- YouTube 在移动端使用官方隐私增强 iframe 播放器；设备网络仍需能够访问 YouTube。
+- 哔哩哔哩 BV、av、ep、ss 完整链接在移动端使用官方嵌入播放器；支持分 P 和链接中的起始时间。Android 8 及更早版本的普通 BV/av 链接会回退到旧版官方移动播放器。
+- Vimeo 继续使用 iframe 播放器。
 - 本地仓库媒体继续使用 Obsidian 的资源 URL 播放。
 
 ### 已知限制
 
-- 哔哩哔哩移动端 iframe 暂不接入 Media Extended 的播放控制、时间戳读取和截图。
-- YouTube iframe 的视频画面受浏览器同源策略保护。Obsidian Mobile 没有 Electron `webContents` 或官方截图 API，因此插件目前无法获取精确视频帧；时间戳和普通播放仍可使用。
+- YouTube 与哔哩哔哩移动端 iframe 暂不接入 Media Extended 的播放控制、时间戳读取和截图。
+- iframe 视频画面受浏览器同源策略保护。Obsidian Mobile 没有 Electron `webContents` 或官方截图 API，因此插件目前无法获取精确视频帧。
 - B 站短链 `b23.tv` 需要先展开成完整链接。
 - 桌面端继续使用原有 Electron 网页播放器能力。
 
