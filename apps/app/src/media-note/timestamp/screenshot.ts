@@ -85,6 +85,7 @@ export async function saveScreenshotInfo<T extends PlayerComponent>(
   { file: newNote, editor }: { file: TFile; editor: Editor },
   { blob, time }: ScreenshotInfo,
   state?: Readonly<MediaPlayerState>,
+  { avoidOverwrite = false }: { avoidOverwrite?: boolean } = {},
 ): Promise<boolean> {
   const media = playerComponent.getMediaInfo();
   if (!media) {
@@ -119,8 +120,16 @@ export async function saveScreenshotInfo<T extends PlayerComponent>(
     plugin: playerComponent.plugin,
     sourcePath: newNote.path,
   });
-  const screenshotFilename = `${screenshotName}.${ext}`;
-  const screenshotPath = normalizePath(`${folder.path}/${screenshotFilename}`);
+  let screenshotFilename = `${screenshotName}.${ext}`;
+  let screenshotPath = normalizePath(`${folder.path}/${screenshotFilename}`);
+  if (avoidOverwrite) {
+    let suffix = 1;
+    while (vault.getAbstractFileByPath(screenshotPath) !== null) {
+      screenshotFilename = `${screenshotName}-${suffix}.${ext}`;
+      screenshotPath = normalizePath(`${folder.path}/${screenshotFilename}`);
+      suffix += 1;
+    }
+  }
 
   let isNew = false;
   let screenshotFile = vault.getAbstractFileByPath(screenshotPath);

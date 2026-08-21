@@ -38,7 +38,7 @@ class MobileScreenshotImportModal extends Modal {
       Platform.isIosApp ? "导入 iPad 系统截图" : "导入 Android 系统截图",
     );
     this.contentEl.createEl("p", {
-      text: "请先暂停视频并完成系统截图，再选择刚刚保存的截图。插件会自动裁剪播放器区域并插入媒体笔记。",
+      text: "请先暂停视频并完成系统截图，再选择刚刚保存的截图。插件会自动裁剪播放器区域并插入此前聚焦的笔记。",
     });
 
     const form = this.contentEl.createEl("form");
@@ -52,8 +52,8 @@ class MobileScreenshotImportModal extends Modal {
     timeInput.style.display = "block";
     timeInput.style.width = "100%";
 
-    const fileLabel = form.createEl("label", { text: "系统截图" });
-    const fileInput = fileLabel.createEl("input", {
+    form.createEl("label", { text: "系统截图" });
+    const fileInput = form.createEl("input", {
       type: "file",
       attr: {
         name: "screenshot-file",
@@ -61,8 +61,21 @@ class MobileScreenshotImportModal extends Modal {
         required: true,
       },
     });
-    fileInput.style.display = "block";
-    fileInput.style.width = "100%";
+    fileInput.style.display = "none";
+
+    const selectImageButton = form.createEl("button", {
+      text: "从相册或图片中选择",
+      attr: { type: "button" },
+    });
+    selectImageButton.onclick = () => {
+      fileInput.value = "";
+      fileInput.click();
+    };
+    if (Platform.isAndroidApp) {
+      form.createEl("small", {
+        text: "部分 Android 系统会打开文件窗口，请从“图片”或“最近”中选择截图。",
+      }).style.display = "block";
+    }
 
     const autoImportLabel = form.createEl("label");
     autoImportLabel.style.display = "block";
@@ -244,6 +257,8 @@ export async function importMobileSystemScreenshot(
         view,
         { file: targetNote.view.file, editor: targetNote.view.editor },
         screenshot,
+        undefined,
+        { avoidOverwrite: true },
       );
       new Notice(`截图已插入“${targetNote.view.file.basename}”`);
     } finally {

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.5] - 2026-08-22
+
+### Fixed
+
+- Each imported system screenshot now uses a new filename instead of overwriting the first `00:00` image, preventing Obsidian's image cache from showing the first import again.
+- Replaced the browser-default file-input label with a clear image-selection button and Android guidance for systems whose WebView opens Documents instead of the system photo picker.
+
 ## [3.3.0-mobile.4] - 2026-08-22
 
 ### Added
