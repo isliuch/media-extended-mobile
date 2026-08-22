@@ -86,13 +86,15 @@ final class LocalCaptureServer {
         return current == -1 && value.length() == 0 ? null : value.toString();
     }
 
-    private Map<String, String> parseQuery(String query) {
+    private Map<String, String> parseQuery(String query) throws IOException {
         Map<String, String> values = new HashMap<>();
         for (String pair : query.split("&")) {
             int separator = pair.indexOf('=');
             if (separator > 0) values.put(
-                URLDecoder.decode(pair.substring(0, separator), StandardCharsets.UTF_8),
-                URLDecoder.decode(pair.substring(separator + 1), StandardCharsets.UTF_8)
+                // The Charset overload requires API 33. The charset-name
+                // overload has existed since API 1 and is required on 8.1.
+                URLDecoder.decode(pair.substring(0, separator), "UTF-8"),
+                URLDecoder.decode(pair.substring(separator + 1), "UTF-8")
             );
         }
         return values;

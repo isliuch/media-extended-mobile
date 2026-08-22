@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.8] - 2026-08-22
+
+### Fixed
+
+- Fixed the Android capture companion's loopback server on Android 8.1 by replacing an API 33-only URL decoder overload with the API 1-compatible overload.
+- Increased the companion APK version to 1.0.1 (`versionCode` 2) so existing installations can be upgraded normally.
+
 ## [3.3.0-mobile.7] - 2026-08-22
 
 ### Fixed

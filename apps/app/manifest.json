@@ -1,7 +1,7 @@
 {
   "id": "media-extended-mobile",
   "name": "Media Extended Mobile",
-  "version": "3.3.0-mobile.7",
+  "version": "3.3.0-mobile.8",
   "minAppVersion": "1.5.7",
   "description": "Media playback and video notes for Obsidian, with mobile support",
   "author": "AidenLx, isliuch",
