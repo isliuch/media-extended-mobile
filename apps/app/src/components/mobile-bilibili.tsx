@@ -2,9 +2,8 @@ import type { MediaURL } from "@/info/media-url";
 import { buildBilibiliEmbedUrl } from "@/web/url-match/bilibili-embed";
 import { buildYouTubeEmbedUrl } from "@/web/url-match/youtube-embed";
 
-function isLegacyAndroid() {
-  const match = navigator.userAgent.match(/Android\s+(\d+)/i);
-  return !!match && Number(match[1]) <= 8;
+function isAndroid() {
+  return /Android/i.test(navigator.userAgent);
 }
 
 function MobileEmbedPlayer({
@@ -37,7 +36,10 @@ function MobileEmbedPlayer({
 }
 
 export function MobileBilibiliPlayer({ media }: { media: MediaURL }) {
-  const src = buildBilibiliEmbedUrl(media, isLegacyAndroid());
+  // player.bilibili.com can render its chrome in Android WebView while never
+  // resolving the media (00:00 / 00:00). Bilibili's mobile HTML5 endpoint is
+  // also compatible with older WebViews, so use it for every Android version.
+  const src = buildBilibiliEmbedUrl(media, isAndroid());
 
   if (!src) {
     return (

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.7] - 2026-08-22
+
+### Fixed
+
+- Android BV/av videos now use Bilibili's official mobile HTML5 player on every supported Android version, avoiding cases where the desktop embed rendered its controls but stayed at `00:00 / 00:00`.
+- Added both current `p` and legacy `page` parameters for multi-part Bilibili videos.
+
 ## [3.3.0-mobile.6] - 2026-08-22
 
 ### Added

@@ -19,6 +19,7 @@ assert.equal(embed("/video/av170001")?.searchParams.get("aid"), "170001");
 assert.equal(embed("/bangumi/play/ep1")?.searchParams.get("ep_id"), "1");
 assert.equal(embed("/bangumi/play/ss2")?.searchParams.get("season_id"), "2");
 assert.equal(embed("/video/BV1xx411c7mD", "?p=3")?.searchParams.get("page"), "3");
+assert.equal(embed("/video/BV1xx411c7mD", "?p=3")?.searchParams.get("p"), "3");
 assert.equal(embed("/video/BV1xx411c7mD", "", 12.9)?.searchParams.get("t"), "12");
 assert.equal(embed("/not-a-video"), null);
 

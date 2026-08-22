@@ -5,14 +5,14 @@ export interface BilibiliEmbedSource {
 
 export function buildBilibiliEmbedUrl(
   media: BilibiliEmbedSource,
-  legacyAndroid = false,
+  android = false,
 ): string | null {
   const id = media.cleaned.pathname.split("/").filter(Boolean).pop();
   if (!id) return null;
 
-  const legacyVideo = legacyAndroid && /^(BV[\dA-Za-z]+|av\d+)$/i.test(id);
+  const androidVideo = android && /^(BV[\dA-Za-z]+|av\d+)$/i.test(id);
   const url = new URL(
-    legacyVideo
+    androidVideo
       ? "https://www.bilibili.com/blackboard/html5mobileplayer.html"
       : "https://player.bilibili.com/player.html",
   );
@@ -23,7 +23,13 @@ export function buildBilibiliEmbedUrl(
   else return null;
 
   const page = media.cleaned.searchParams.get("p");
-  if (page) url.searchParams.set("page", page);
+  if (page) {
+    // The current external-player documentation uses `p`, while the mobile
+    // HTML5 endpoint historically used `page`. Supplying both keeps multi-part
+    // videos working with either implementation.
+    url.searchParams.set("p", page);
+    url.searchParams.set("page", page);
+  }
   const start = media.tempFrag?.start;
   if (start && start > 0) url.searchParams.set("t", String(Math.floor(start)));
 

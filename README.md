@@ -13,7 +13,7 @@ Media Extended 的可维护移动端分支，基于上游最后一个 MIT 开源
 - 插件清单已允许 Obsidian Mobile 正常安装，无需 BRAT 的“不兼容插件”开关。
 - 模块初始化不再在移动端加载 Node `path`/`url` API。
 - YouTube 在移动端使用官方隐私增强 iframe 播放器；设备网络仍需能够访问 YouTube。
-- 哔哩哔哩 BV、av、ep、ss 完整链接在移动端使用官方嵌入播放器；支持分 P 和链接中的起始时间。Android 8 及更早版本的普通 BV/av 链接会回退到旧版官方移动播放器。
+- 哔哩哔哩 BV、av、ep、ss 完整链接在移动端使用官方嵌入播放器；支持分 P 和链接中的起始时间。Android 上的普通 BV/av 链接统一使用官方移动 HTML5 播放器，以兼容不同版本的系统 WebView。
 - Vimeo 继续使用 iframe 播放器。
 - 本地仓库媒体继续使用 Obsidian 的资源 URL 播放。
 - Android 可选安装独立的 Media Extended 截图助手 APK。新增的“辅助 APK 一键截图”按钮使用系统 MediaProjection 授权抓取当前屏幕，自动裁剪播放器并插入此前聚焦的笔记；原相机按钮和图片导入按钮均保留。

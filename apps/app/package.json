@@ -1,7 +1,7 @@
 {
   "name": "media-extended-mobile",
   "type": "module",
-  "version": "3.3.0-mobile.6",
+  "version": "3.3.0-mobile.7",
   "scripts": {
     "build:dependencies": "pnpm --filter @codemirror/language prepare",
     "prebuild": "pnpm run build:dependencies",
