@@ -11,6 +11,7 @@ import {
 
 const HELPER_ORIGIN = "http://127.0.0.1:47831";
 const HELPER_SCHEME = "mxextendedcapture://authorize";
+const HELPER_ACCESSIBILITY_SCHEME = "mxextendedcapture://accessibility";
 const sessionToken = createSessionToken();
 
 function createSessionToken() {
@@ -39,16 +40,24 @@ async function helperReady() {
   }
 }
 
-function openHelperAuthorization() {
+function openHelperLink(scheme: string) {
   const link = document.body.createEl("a", {
     attr: {
-      href: `${HELPER_SCHEME}?token=${sessionToken}`,
+      href: `${scheme}?token=${sessionToken}`,
       rel: "noopener",
     },
   });
   link.style.display = "none";
   link.click();
   window.setTimeout(() => link.remove(), 1_000);
+}
+
+function openHelperAuthorization() {
+  openHelperLink(HELPER_SCHEME);
+}
+
+function openHelperAccessibilitySettings() {
+  openHelperLink(HELPER_ACCESSIBILITY_SCHEME);
 }
 
 async function waitForHelper(timeoutMs = 30_000) {
@@ -87,6 +96,9 @@ async function requestScreenPng(
   const detected = Object.entries(response.headers).find(
     ([name]) => name.toLowerCase() === "x-media-time",
   )?.[1];
+  const automation = Object.entries(response.headers).find(
+    ([name]) => name.toLowerCase() === "x-media-automation",
+  )?.[1];
   const detectedTime = detected === undefined ? null : Number(detected);
   return {
     image: new Blob([response.arrayBuffer], { type: contentType }),
@@ -96,6 +108,7 @@ async function requestScreenPng(
       detectedTime >= 0
         ? detectedTime
         : null,
+    automation,
   };
 }
 
@@ -133,6 +146,14 @@ export async function captureWithAndroidHelper(
     const settings = view.plugin.settings.getState();
     const playerTime = getMobilePlaybackTime(view.containerEl);
     const capture = await requestScreenPng(target, playerTime === null);
+    if (capture.automation === "accessibility-required") {
+      new Notice(
+        "请启用“Media Extended 自动显示视频进度”无障碍服务；返回 Obsidian 后再次截图即可全自动完成",
+        10_000,
+      );
+      openHelperAccessibilitySettings();
+      return;
+    }
     const time =
       playerTime ??
       capture.detectedTime ??

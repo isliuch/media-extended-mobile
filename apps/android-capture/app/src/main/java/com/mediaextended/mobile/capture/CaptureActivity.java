@@ -10,6 +10,7 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ public final class CaptureActivity extends Activity {
     private static final int CAPTURE_REQUEST = 4101;
     private static final int NOTIFICATION_REQUEST = 4100;
     private String sessionToken;
+    private boolean waitingForAccessibilitySettings;
+    private boolean pausedForAccessibilitySettings;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -37,7 +40,7 @@ public final class CaptureActivity extends Activity {
         text.setGravity(Gravity.CENTER);
         text.setPadding(48, 48, 48, 48);
         text.setTextSize(18);
-        text.setText("Media Extended 截图助手\n\n请从 Obsidian 的媒体页面点击“辅助 APK 一键截图”。\n\n授权后通知栏会显示正在运行的截图会话，可随时点“停止”。");
+        text.setText("Media Extended 截图助手\n\n请从 Obsidian 的媒体页面点击“辅助 APK 一键截图”。\n\n如需自动显示哔哩哔哩进度条，请按插件提示启用“Media Extended 自动显示视频进度”无障碍服务。\n\n授权后通知栏会显示正在运行的截图会话，可随时点“停止”。");
         setContentView(text);
     }
 
@@ -52,6 +55,14 @@ public final class CaptureActivity extends Activity {
                 .show();
             return;
         }
+
+        if ("accessibility".equals(uri.getHost())) {
+            waitingForAccessibilitySettings = true;
+            pausedForAccessibilitySettings = false;
+            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+            return;
+        }
+        if (!"authorize".equals(uri.getHost())) return;
 
         if (CaptureService.isReady()) {
             CaptureService.updateToken(sessionToken);
@@ -69,6 +80,21 @@ public final class CaptureActivity extends Activity {
             return;
         }
         requestProjectionAuthorization();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (waitingForAccessibilitySettings) pausedForAccessibilitySettings = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (waitingForAccessibilitySettings && pausedForAccessibilitySettings) {
+            waitingForAccessibilitySettings = false;
+            returnToObsidian();
+        }
     }
 
     private void requestProjectionAuthorization() {

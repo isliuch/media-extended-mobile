@@ -65,16 +65,35 @@ final class LocalCaptureServer {
                 return;
             }
             if ("/status".equals(path)) {
-                respond(output, 200, "application/json", "{\"ready\":true}".getBytes(StandardCharsets.UTF_8));
+                String status = "{\"ready\":true,\"accessibilityReady\":"
+                    + PlayerControlAccessibilityService.isReady() + "}";
+                respond(output, 200, "application/json", status.getBytes(StandardCharsets.UTF_8));
             } else if ("/capture".equals(path)) {
                 byte[] png = service.capturePng();
                 Long time = null;
+                String automation = null;
                 try {
                     time = timeRecognizer.recognize(png, query);
                 } catch (Exception ignored) {
                     // OCR is best-effort. A valid screenshot must still be returned.
                 }
-                respond(output, 200, "image/png", png, time);
+                if ("1".equals(query.get("recognizeTime")) && time == null) {
+                    if (!PlayerControlAccessibilityService.isReady()) {
+                        automation = "accessibility-required";
+                    } else if (PlayerControlAccessibilityService.revealPlayerControls(query)) {
+                        try {
+                            Thread.sleep(350);
+                            png = service.capturePng();
+                            time = timeRecognizer.recognize(png, query);
+                            automation = "controls-revealed";
+                        } catch (Exception ignored) {
+                            automation = "controls-reveal-failed";
+                        }
+                    } else {
+                        automation = "controls-reveal-failed";
+                    }
+                }
+                respond(output, 200, "image/png", png, time, automation);
             } else {
                 respond(output, 404, "application/json", "{\"error\":\"not_found\"}".getBytes(StandardCharsets.UTF_8));
             }
@@ -119,16 +138,28 @@ final class LocalCaptureServer {
         byte[] body,
         Long mediaTime
     ) throws IOException {
+        respond(output, status, type, body, mediaTime, null);
+    }
+
+    private void respond(
+        BufferedOutputStream output,
+        int status,
+        String type,
+        byte[] body,
+        Long mediaTime,
+        String automation
+    ) throws IOException {
         String reason = status == 200 ? "OK" : status == 204 ? "No Content" : status == 401 ? "Unauthorized" : "Not Found";
         String headers = "HTTP/1.1 " + status + " " + reason + "\r\n"
             + "Content-Type: " + type + "\r\n"
             + "Content-Length: " + body.length + "\r\n"
             + (mediaTime == null ? "" : "X-Media-Time: " + mediaTime + "\r\n")
+            + (automation == null ? "" : "X-Media-Automation: " + automation + "\r\n")
             + "Cache-Control: no-store\r\n"
             + "Access-Control-Allow-Origin: *\r\n"
             + "Access-Control-Allow-Methods: GET, OPTIONS\r\n"
             + "Access-Control-Allow-Headers: Content-Type\r\n"
-            + "Access-Control-Expose-Headers: X-Media-Time\r\n"
+            + "Access-Control-Expose-Headers: X-Media-Time, X-Media-Automation\r\n"
             + "Access-Control-Allow-Private-Network: true\r\n"
             + "Connection: close\r\n\r\n";
         output.write(headers.getBytes(StandardCharsets.US_ASCII));

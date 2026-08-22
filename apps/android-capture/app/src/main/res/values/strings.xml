@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_description">仅在您从 Obsidian 请求截图且画面中没有时间时，点击视频区域以显示播放控制条。</string>
+</resources>

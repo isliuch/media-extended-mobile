@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.10] - 2026-08-23
+
+### Added
+
+- Added an opt-in Android accessibility service that automatically taps the visible Obsidian video area when the first capture contains no readable playback time.
+- The capture helper now takes a second screenshot after revealing the player controls and uses that image and its recognized current time for insertion.
+- When the accessibility service is not enabled, the plugin opens the Android accessibility settings with setup guidance; the service only accepts gestures while Obsidian is the foreground app and after an authenticated loopback capture request.
+
+### Changed
+
+- Increased the companion APK version to 1.0.3 (`versionCode` 4).
+
 ## [3.3.0-mobile.9] - 2026-08-23
 
 ### Added

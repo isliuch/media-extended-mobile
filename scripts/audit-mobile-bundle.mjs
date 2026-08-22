@@ -20,6 +20,9 @@ if (!bundle.includes("https://www.youtube.com/iframe_api")) {
 if (!bundle.toLowerCase().includes("x-media-time")) {
   failures.push("Android screenshot-time bridge is missing from main.js");
 }
+if (!bundle.toLowerCase().includes("x-media-automation")) {
+  failures.push("Android automatic control-reveal bridge is missing from main.js");
+}
 if (bundle.includes('require("url")')) {
   failures.push("main.js still contains a top-level-compatible Node url dependency");
 }
