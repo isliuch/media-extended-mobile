@@ -6,7 +6,10 @@ import {
   type ScreenshotCropTarget,
 } from "@/lib/imported-screenshot";
 import type { ScreenshotInfo } from "@/lib/screenshot";
-import { getMostRecentEditorLeaf } from "@/media-note/active-editor";
+import {
+  getMostRecentEditorLeaf,
+  type EditableMarkdownLeaf,
+} from "@/media-note/active-editor";
 import { saveScreenshotInfo } from "@/media-note/timestamp/screenshot";
 import type { PlayerComponent } from "./base";
 
@@ -126,7 +129,9 @@ class MobileScreenshotImportModal extends Modal {
   }
 }
 
-function getCropTarget(containerEl: HTMLElement): ScreenshotCropTarget | null {
+export function getMobileScreenshotCropTarget(
+  containerEl: HTMLElement,
+): ScreenshotCropTarget | null {
   const frame = Array.from(
     containerEl.querySelectorAll<HTMLIFrameElement>(
       ".mx-mobile-embed-frame iframe, iframe",
@@ -148,7 +153,7 @@ function getCropTarget(containerEl: HTMLElement): ScreenshotCropTarget | null {
   };
 }
 
-function loadImage(file: File): Promise<HTMLImageElement> {
+function loadImage(file: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const image = new Image();
@@ -164,8 +169,8 @@ function loadImage(file: File): Promise<HTMLImageElement> {
   });
 }
 
-async function cropScreenshot(
-  file: File,
+export async function cropMobileScreenshot(
+  file: Blob,
   target: ScreenshotCropTarget,
   time: number,
   requestedType: "image/jpeg" | "image/webp" | "image/png",
@@ -215,6 +220,27 @@ async function cropScreenshot(
   };
 }
 
+export async function saveMobileScreenshot(
+  view: PlayerComponent & ItemView,
+  targetNote: EditableMarkdownLeaf,
+  screenshot: ScreenshotInfo,
+) {
+  const previousActiveDocument = window.activeDocument;
+  window.activeDocument = targetNote.containerEl.doc;
+  try {
+    await saveScreenshotInfo(
+      view,
+      { file: targetNote.view.file, editor: targetNote.view.editor },
+      screenshot,
+      undefined,
+      { avoidOverwrite: true },
+    );
+    new Notice(`截图已插入“${targetNote.view.file.basename}”`);
+  } finally {
+    window.activeDocument = previousActiveDocument;
+  }
+}
+
 export async function importMobileSystemScreenshot(
   view: PlayerComponent & ItemView,
 ) {
@@ -223,7 +249,7 @@ export async function importMobileSystemScreenshot(
     new Notice("当前没有打开媒体");
     return;
   }
-  const target = getCropTarget(view.containerEl);
+  const target = getMobileScreenshotCropTarget(view.containerEl);
   if (!target) {
     new Notice("没有找到可裁剪的移动播放器");
     return;
@@ -243,27 +269,14 @@ export async function importMobileSystemScreenshot(
 
   try {
     const settings = view.plugin.settings.getState();
-    const screenshot = await cropScreenshot(
+    const screenshot = await cropMobileScreenshot(
       selection.file,
       target,
       selection.time,
       settings.screenshotFormat,
       settings.screenshotQuality,
     );
-    const previousActiveDocument = window.activeDocument;
-    window.activeDocument = targetNote.containerEl.doc;
-    try {
-      await saveScreenshotInfo(
-        view,
-        { file: targetNote.view.file, editor: targetNote.view.editor },
-        screenshot,
-        undefined,
-        { avoidOverwrite: true },
-      );
-      new Notice(`截图已插入“${targetNote.view.file.basename}”`);
-    } finally {
-      window.activeDocument = previousActiveDocument;
-    }
+    await saveMobileScreenshot(view, targetNote, screenshot);
   } catch (error) {
     console.error("Failed to import mobile system screenshot", error);
     new Notice(

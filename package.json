@@ -8,6 +8,7 @@
   "scripts": {
     "audit:mobile": "node scripts/audit-mobile-bundle.mjs",
     "build": "turbo run build",
+    "build:android-helper": "cd apps/android-capture && ./gradlew :app:assembleDebug",
     "build:plugin": "pnpm --filter ./apps/app build",
     "dev": "turbo run dev",
     "prepare:release": "node scripts/prepare-release.mjs",

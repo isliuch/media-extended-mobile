@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.6] - 2026-08-22
+
+### Added
+
+- Added an optional Android 8.0+ companion APK using the official MediaProjection API for one-tap screen capture.
+- Added a separate “辅助 APK 一键截图” action without replacing the existing screenshot and system-image import actions.
+- The companion keeps one authorized foreground capture session for repeated screenshots, returns each fresh full-screen PNG over a token-protected loopback-only endpoint, and lets the plugin crop and insert it into the previously focused editable note.
+
+### Security
+
+- The capture endpoint binds only to `127.0.0.1` and requires a new random session token after every plugin load.
+- Full-screen captures remain in memory and are not written by the companion APK.
+
 ## [3.3.0-mobile.5] - 2026-08-22
 
 ### Fixed

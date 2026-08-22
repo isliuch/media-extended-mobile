@@ -16,18 +16,22 @@ Media Extended 的可维护移动端分支，基于上游最后一个 MIT 开源
 - 哔哩哔哩 BV、av、ep、ss 完整链接在移动端使用官方嵌入播放器；支持分 P 和链接中的起始时间。Android 8 及更早版本的普通 BV/av 链接会回退到旧版官方移动播放器。
 - Vimeo 继续使用 iframe 播放器。
 - 本地仓库媒体继续使用 Obsidian 的资源 URL 播放。
+- Android 可选安装独立的 Media Extended 截图助手 APK。新增的“辅助 APK 一键截图”按钮使用系统 MediaProjection 授权抓取当前屏幕，自动裁剪播放器并插入此前聚焦的笔记；原相机按钮和图片导入按钮均保留。
 
 ### 已知限制
 
 - YouTube 与哔哩哔哩移动端 iframe 暂不接入 Media Extended 的播放控制和自动时间戳读取。
 - iframe 视频画面受浏览器同源策略保护。Android/iOS 上可先聚焦目标笔记，再切到视频完成系统截图并点击新增的“导入并裁剪系统截图”按钮；默认勾选“选择图片后自动导入”，选好截图后会立即裁剪播放器区域并插入此前聚焦的笔记，不会新建媒体笔记。原有相机截图按钮保持不变。
 - Android 是否直接显示系统相册由 Obsidian WebView 和系统版本决定；Android 8 或部分 ROM 可能显示文件窗口，此时从“图片”或“最近”中选择截图。
+- 辅助 APK 支持 Android 8.0 及以上。首次使用或录屏会话结束后需要确认 Android 系统录屏授权；同一会话内后续截图无需重复授权。DRM/`FLAG_SECURE` 视频仍可能得到黑色画面。
 - B 站短链 `b23.tv` 需要先展开成完整链接。
 - 桌面端继续使用原有 Electron 网页播放器能力。
 
 ## 安装
 
 BRAT 1.1.0 及以上版本从 GitHub Release 安装插件。把本仓库地址加入 BRAT，选择最新的 `*-mobile.*` 预发布版本即可。Release 必须包含 `main.js`、`manifest.json` 和 `styles.css`。
+
+BRAT 只安装 Obsidian 插件，不能安装 Android 应用。需要一键截图时，还要从同一个 GitHub Release 手动下载并安装 `media-extended-capture.apk`；不安装 APK 时仍可使用“导入并裁剪系统截图”。详细说明见 [`apps/android-capture/README.md`](./apps/android-capture/README.md)。
 
 测试链接：
 
@@ -43,6 +47,7 @@ corepack pnpm@9.15.9 install --frozen-lockfile
 pnpm type-check
 pnpm build:plugin
 pnpm prepare:release
+pnpm build:android-helper
 ```
 
 推送与 `manifest.json` 版本一致的 `*-mobile.*` 标签后，GitHub Actions 会构建并创建 BRAT 可识别的预发布版本。
@@ -62,7 +67,7 @@ pnpm prepare:release
 - [x] **Mobile installation and basic playback** 📱
 - [ ] **Bilibili playback state and timestamp bridge**
 - [x] **Android/iOS system screenshot import and automatic player-area cropping**
-- [ ] **A direct mobile screenshot bridge, if Obsidian exposes a supported API**
+- [x] **Optional Android MediaProjection screenshot bridge**
 - [ ] **Metadata and Subtitle Extraction** 📊: Pull metadata and subtitles directly from YouTube and Bilibili.
 
 - [ ] **Canvas Support** 🎨: Get creative with how you integrate and display media within your notes.

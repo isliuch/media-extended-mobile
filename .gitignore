@@ -2,6 +2,10 @@
 
 # Dependencies
 node_modules
+.gradle
+*.jks
+*.keystore
+keystore.properties
 .pnp
 .pnp.js
 

@@ -16,6 +16,7 @@ import { saveScreenshot } from "@/media-note/timestamp/screenshot";
 import { takeTimestamp } from "@/media-note/timestamp/timestamp";
 import type MediaExtended from "@/mx-main";
 import type { MediaInfo } from "../info/media-info";
+import { captureWithAndroidHelper } from "./android-capture";
 import { noticeNotetaking } from "./notice-notetaking";
 import { importMobileSystemScreenshot } from "./mobile-screenshot";
 import {
@@ -83,6 +84,11 @@ export function addAction(player: PlayerComponent & ItemView) {
     player.addAction("crop", "导入并裁剪系统截图", () =>
       importMobileSystemScreenshot(player),
     );
+    if (Platform.isAndroidApp) {
+      player.addAction("scan", "辅助 APK 一键截图", () =>
+        captureWithAndroidHelper(player),
+      );
+    }
   }
 }
 
