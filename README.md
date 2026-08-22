@@ -16,14 +16,14 @@ Media Extended 的可维护移动端分支，基于上游最后一个 MIT 开源
 - 哔哩哔哩 BV、av、ep、ss 完整链接在移动端使用官方嵌入播放器；支持分 P 和链接中的起始时间。Android 上的普通 BV/av 链接统一使用官方移动 HTML5 播放器，以兼容不同版本的系统 WebView。
 - Vimeo 继续使用 iframe 播放器。
 - 本地仓库媒体继续使用 Obsidian 的资源 URL 播放。
-- Android 可选安装独立的 Media Extended 截图助手 APK。新增的“辅助 APK 一键截图”按钮使用系统 MediaProjection 授权抓取当前屏幕，自动裁剪播放器并插入此前聚焦的笔记；原相机按钮和图片导入按钮均保留。
+- Android 可选安装独立的 Media Extended 截图助手 APK。新增的“辅助 APK 一键截图”按钮使用系统 MediaProjection 授权抓取当前屏幕，自动裁剪播放器、识别当前视频时间并插入此前聚焦的笔记；原相机按钮和图片导入按钮均保留。
 
 ### 已知限制
 
-- YouTube 与哔哩哔哩移动端 iframe 暂不接入 Media Extended 的播放控制和自动时间戳读取。
+- YouTube 移动端截图会通过官方 IFrame Player API 读取当前播放时间。哔哩哔哩官方 iframe 没有向宿主页面提供时间 API；Android 截图助手 1.0.2 及以上会在设备本地识别截图控制条上的当前时间。控制条未显示或识别不可靠时，插件会请用户输入时间，不会把链接的起始时间当成截图时间。
 - iframe 视频画面受浏览器同源策略保护。Android/iOS 上可先聚焦目标笔记，再切到视频完成系统截图并点击新增的“导入并裁剪系统截图”按钮；默认勾选“选择图片后自动导入”，选好截图后会立即裁剪播放器区域并插入此前聚焦的笔记，不会新建媒体笔记。原有相机截图按钮保持不变。
 - Android 是否直接显示系统相册由 Obsidian WebView 和系统版本决定；Android 8 或部分 ROM 可能显示文件窗口，此时从“图片”或“最近”中选择截图。
-- 辅助 APK 支持 Android 8.0 及以上（Android 8.x 请使用 1.0.1 或更新版本）。首次使用或录屏会话结束后需要确认 Android 系统录屏授权；同一会话内后续截图无需重复授权。DRM/`FLAG_SECURE` 视频仍可能得到黑色画面。
+- 辅助 APK 支持 Android 8.0 及以上（Android 8.x 请使用 1.0.2 或更新版本）。首次使用或录屏会话结束后需要确认 Android 系统录屏授权；同一会话内后续截图无需重复授权。识别前请让播放器控制条显示在画面上。DRM/`FLAG_SECURE` 视频仍可能得到黑色画面。
 - B 站短链 `b23.tv` 需要先展开成完整链接。
 - 桌面端继续使用原有 Electron 网页播放器能力。
 
@@ -65,7 +65,7 @@ pnpm build:android-helper
 ## 后续计划
 
 - [x] **Mobile installation and basic playback** 📱
-- [ ] **Bilibili playback state and timestamp bridge**
+- [x] **Mobile screenshot timestamp capture (YouTube API / Android on-device OCR)**
 - [x] **Android/iOS system screenshot import and automatic player-area cropping**
 - [x] **Optional Android MediaProjection screenshot bridge**
 - [ ] **Metadata and Subtitle Extraction** 📊: Pull metadata and subtitles directly from YouTube and Bilibili.

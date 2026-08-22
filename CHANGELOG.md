@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.9] - 2026-08-23
+
+### Added
+
+- YouTube mobile screenshots now use the official IFrame Player API to record the current playback time.
+- Android capture-helper screenshots can read the visible Bilibili/YouTube control-bar time with an on-device bundled text recognizer; no Google Play services or network request is required for recognition.
+- When neither player API nor screenshot recognition can provide a reliable time, the plugin asks for `mm:ss`/`hh:mm:ss` input or allows importing at `00:00`.
+
+### Changed
+
+- System-screenshot importing pre-fills the live YouTube playback time when available instead of reusing the media link's original start fragment.
+- Increased the companion APK version to 1.0.2 (`versionCode` 3).
+
 ## [3.3.0-mobile.8] - 2026-08-22
 
 ### Fixed

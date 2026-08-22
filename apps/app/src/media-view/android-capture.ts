@@ -1,10 +1,11 @@
 import { Notice, Platform, requestUrl, type ItemView } from "obsidian";
-import { isFileMediaInfo } from "@/info/media-info";
 import { getMostRecentEditorLeaf } from "@/media-note/active-editor";
 import type { PlayerComponent } from "./base";
+import { getMobilePlaybackTime } from "./mobile-playback-time";
 import {
   cropMobileScreenshot,
   getMobileScreenshotCropTarget,
+  promptMobileScreenshotTime,
   saveMobileScreenshot,
 } from "./mobile-screenshot";
 
@@ -20,8 +21,9 @@ function createSessionToken() {
   );
 }
 
-function helperUrl(path: string) {
-  return `${HELPER_ORIGIN}${path}?token=${sessionToken}`;
+function helperUrl(path: string, params?: Record<string, string>) {
+  const query = new URLSearchParams({ token: sessionToken, ...params });
+  return `${HELPER_ORIGIN}${path}?${query}`;
 }
 
 async function helperReady() {
@@ -60,9 +62,21 @@ async function waitForHelper(timeoutMs = 30_000) {
   return false;
 }
 
-async function requestScreenPng() {
+async function requestScreenPng(
+  target: ReturnType<typeof getMobileScreenshotCropTarget>,
+  recognizeTime: boolean,
+) {
+  if (!target) throw new Error("没有找到可裁剪的移动播放器");
   const response = await requestUrl({
-    url: helperUrl("/capture"),
+    url: helperUrl("/capture", {
+      recognizeTime: recognizeTime ? "1" : "0",
+      left: String(target.left),
+      top: String(target.top),
+      width: String(target.width),
+      height: String(target.height),
+      viewportWidth: String(target.viewportWidth),
+      viewportHeight: String(target.viewportHeight),
+    }),
     method: "GET",
     throw: false,
   });
@@ -70,7 +84,19 @@ async function requestScreenPng() {
     throw new Error(`截图助手返回 HTTP ${response.status}`);
   }
   const contentType = response.headers["content-type"] ?? "image/png";
-  return new Blob([response.arrayBuffer], { type: contentType });
+  const detected = Object.entries(response.headers).find(
+    ([name]) => name.toLowerCase() === "x-media-time",
+  )?.[1];
+  const detectedTime = detected === undefined ? null : Number(detected);
+  return {
+    image: new Blob([response.arrayBuffer], { type: contentType }),
+    detectedTime:
+      detectedTime !== null &&
+      Number.isFinite(detectedTime) &&
+      detectedTime >= 0
+        ? detectedTime
+        : null,
+  };
 }
 
 export async function captureWithAndroidHelper(
@@ -105,12 +131,15 @@ export async function captureWithAndroidHelper(
     }
 
     const settings = view.plugin.settings.getState();
-    const time = isFileMediaInfo(media)
-      ? 0
-      : Math.max(0, media.tempFrag?.start ?? 0);
-    const fullScreen = await requestScreenPng();
+    const playerTime = getMobilePlaybackTime(view.containerEl);
+    const capture = await requestScreenPng(target, playerTime === null);
+    const time =
+      playerTime ??
+      capture.detectedTime ??
+      (await promptMobileScreenshotTime(view.app));
+    if (time === null) return;
     const screenshot = await cropMobileScreenshot(
-      fullScreen,
+      capture.image,
       target,
       time,
       settings.screenshotFormat,

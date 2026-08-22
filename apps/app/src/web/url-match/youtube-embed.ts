@@ -20,6 +20,7 @@ export function buildYouTubeEmbedUrl(media: YouTubeEmbedSource): string | null {
   }
 
   url.searchParams.set("autoplay", "0");
+  url.searchParams.set("enablejsapi", "1");
   url.searchParams.set("playsinline", "1");
   url.searchParams.set("rel", "0");
   return url.href;

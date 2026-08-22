@@ -17,6 +17,7 @@ final class LocalCaptureServer {
     static final int PORT = 47831;
     private final CaptureService service;
     private final ExecutorService clients = Executors.newCachedThreadPool();
+    private final CaptureTimeRecognizer timeRecognizer = new CaptureTimeRecognizer();
     private ServerSocket socket;
     private Thread acceptThread;
 
@@ -66,7 +67,14 @@ final class LocalCaptureServer {
             if ("/status".equals(path)) {
                 respond(output, 200, "application/json", "{\"ready\":true}".getBytes(StandardCharsets.UTF_8));
             } else if ("/capture".equals(path)) {
-                respond(output, 200, "image/png", service.capturePng());
+                byte[] png = service.capturePng();
+                Long time = null;
+                try {
+                    time = timeRecognizer.recognize(png, query);
+                } catch (Exception ignored) {
+                    // OCR is best-effort. A valid screenshot must still be returned.
+                }
+                respond(output, 200, "image/png", png, time);
             } else {
                 respond(output, 404, "application/json", "{\"error\":\"not_found\"}".getBytes(StandardCharsets.UTF_8));
             }
@@ -101,14 +109,26 @@ final class LocalCaptureServer {
     }
 
     private void respond(BufferedOutputStream output, int status, String type, byte[] body) throws IOException {
+        respond(output, status, type, body, null);
+    }
+
+    private void respond(
+        BufferedOutputStream output,
+        int status,
+        String type,
+        byte[] body,
+        Long mediaTime
+    ) throws IOException {
         String reason = status == 200 ? "OK" : status == 204 ? "No Content" : status == 401 ? "Unauthorized" : "Not Found";
         String headers = "HTTP/1.1 " + status + " " + reason + "\r\n"
             + "Content-Type: " + type + "\r\n"
             + "Content-Length: " + body.length + "\r\n"
+            + (mediaTime == null ? "" : "X-Media-Time: " + mediaTime + "\r\n")
             + "Cache-Control: no-store\r\n"
             + "Access-Control-Allow-Origin: *\r\n"
             + "Access-Control-Allow-Methods: GET, OPTIONS\r\n"
             + "Access-Control-Allow-Headers: Content-Type\r\n"
+            + "Access-Control-Expose-Headers: X-Media-Time\r\n"
             + "Access-Control-Allow-Private-Network: true\r\n"
             + "Connection: close\r\n\r\n";
         output.write(headers.getBytes(StandardCharsets.US_ASCII));
@@ -119,5 +139,6 @@ final class LocalCaptureServer {
     void close() {
         try { if (socket != null) socket.close(); } catch (IOException ignored) { }
         clients.shutdownNow();
+        timeRecognizer.close();
     }
 }

@@ -1,5 +1,4 @@
 import { Modal, Notice, Platform, type App, type ItemView } from "obsidian";
-import { isFileMediaInfo } from "@/info/media-info";
 import {
   calculateScreenshotCrop,
   parseScreenshotTime,
@@ -12,10 +11,82 @@ import {
 } from "@/media-note/active-editor";
 import { saveScreenshotInfo } from "@/media-note/timestamp/screenshot";
 import type { PlayerComponent } from "./base";
+import { getMobilePlaybackTime } from "./mobile-playback-time";
 
 interface ScreenshotSelection {
   file: File;
   time: number;
+}
+
+class MobileScreenshotTimeModal extends Modal {
+  static run(app: App): Promise<number | null> {
+    return new Promise((resolve) => {
+      new MobileScreenshotTimeModal(app, resolve).open();
+    });
+  }
+
+  private resolved = false;
+
+  constructor(
+    app: App,
+    private resolve: (time: number | null) => void,
+  ) {
+    super(app);
+  }
+
+  onOpen() {
+    this.titleEl.setText("输入截图时间");
+    this.contentEl.createEl("p", {
+      text: "未能从播放器或截图控制条自动读取时间。可输入截图画面对应的时间，或按 00:00 导入。",
+    });
+    const form = this.contentEl.createEl("form");
+    const input = form.createEl("input", {
+      type: "text",
+      placeholder: "例如 1:23 或 01:02:03",
+      attr: { inputmode: "decimal", autofocus: true },
+    });
+    input.style.display = "block";
+    input.style.width = "100%";
+
+    const actions = form.createDiv();
+    actions.style.display = "flex";
+    actions.style.gap = "8px";
+    actions.style.marginTop = "12px";
+    const withoutTime = actions.createEl("button", {
+      text: "按 00:00 导入",
+      attr: { type: "button" },
+    });
+    withoutTime.onclick = () => this.finish(0);
+    actions.createEl("button", {
+      text: "使用此时间",
+      cls: "mod-cta",
+      attr: { type: "submit" },
+    });
+    form.onsubmit = (event) => {
+      event.preventDefault();
+      const time = parseScreenshotTime(input.value);
+      if (time === null) {
+        new Notice("视频时间格式无效，请使用秒数、mm:ss 或 hh:mm:ss");
+        return;
+      }
+      this.finish(time);
+    };
+  }
+
+  private finish(time: number) {
+    this.resolved = true;
+    this.resolve(time);
+    this.close();
+  }
+
+  onClose() {
+    this.contentEl.empty();
+    if (!this.resolved) this.resolve(null);
+  }
+}
+
+export function promptMobileScreenshotTime(app: App) {
+  return MobileScreenshotTimeModal.run(app);
 }
 
 class MobileScreenshotImportModal extends Modal {
@@ -260,10 +331,10 @@ export async function importMobileSystemScreenshot(
     return;
   }
 
-  const initialTime = isFileMediaInfo(media) ? undefined : media.tempFrag?.start;
+  const initialTime = getMobilePlaybackTime(view.containerEl);
   const selection = await MobileScreenshotImportModal.run(
     view.app,
-    initialTime && initialTime > 0 ? String(Math.floor(initialTime)) : "",
+    initialTime !== null ? String(Math.floor(initialTime)) : "",
   );
   if (!selection) return;
 

@@ -14,6 +14,12 @@ if (!bundle.includes("https://player.bilibili.com/player.html")) {
 if (!bundle.includes("Platform.isMobile")) {
   failures.push("mobile runtime branch is missing from main.js");
 }
+if (!bundle.includes("https://www.youtube.com/iframe_api")) {
+  failures.push("YouTube playback-time API is missing from main.js");
+}
+if (!bundle.toLowerCase().includes("x-media-time")) {
+  failures.push("Android screenshot-time bridge is missing from main.js");
+}
 if (bundle.includes('require("url")')) {
   failures.push("main.js still contains a top-level-compatible Node url dependency");
 }

@@ -49,6 +49,7 @@ assert.equal(youtube.searchParams.get("list"), "PL123");
 assert.equal(youtube.searchParams.get("start"), "12");
 assert.equal(youtube.searchParams.get("end"), "45");
 assert.equal(youtube.searchParams.get("playsinline"), "1");
+assert.equal(youtube.searchParams.get("enablejsapi"), "1");
 
 assert.equal(parseScreenshotTime(""), 0);
 assert.equal(parseScreenshotTime("83"), 83);
