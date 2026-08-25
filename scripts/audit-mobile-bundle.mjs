@@ -23,6 +23,13 @@ if (!bundle.toLowerCase().includes("x-media-time")) {
 if (!bundle.toLowerCase().includes("x-media-automation")) {
   failures.push("Android automatic control-reveal bridge is missing from main.js");
 }
+const sourceFrameLabel = "\\u9AD8\\u6E05\\u6E90\\u89C6\\u9891\\u5E27";
+if (
+  !bundle.includes("/source-frame") ||
+  !(bundle.includes("高清源视频帧") || bundle.includes(sourceFrameLabel))
+) {
+  failures.push("Android source-frame bridge is missing from main.js");
+}
 if (bundle.includes('require("url")')) {
   failures.push("main.js still contains a top-level-compatible Node url dependency");
 }

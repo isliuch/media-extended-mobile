@@ -40,7 +40,7 @@ public final class CaptureActivity extends Activity {
         text.setGravity(Gravity.CENTER);
         text.setPadding(48, 48, 48, 48);
         text.setTextSize(18);
-        text.setText("Media Extended 截图助手\n\n请从 Obsidian 的媒体页面点击“辅助 APK 一键截图”。\n\n如需自动显示哔哩哔哩进度条，请按插件提示启用“Media Extended 自动显示视频进度”无障碍服务。\n\n授权后通知栏会显示正在运行的截图会话，可随时点“停止”。");
+        text.setText("Media Extended 截图助手\n\n请从 Obsidian 的媒体页面点击“辅助 APK 一键截图”或“高清源视频帧”。\n\n如需自动显示哔哩哔哩进度条，请按插件提示启用“Media Extended 自动显示视频进度”无障碍服务。\n\n授权后通知栏会显示正在运行的截图会话，可随时点“停止”。");
         setContentView(text);
     }
 

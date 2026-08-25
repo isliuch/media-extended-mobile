@@ -1,4 +1,5 @@
 import { Notice, Platform, requestUrl, type ItemView } from "obsidian";
+import { isFileMediaInfo } from "@/info/media-info";
 import { getMostRecentEditorLeaf } from "@/media-note/active-editor";
 import type { PlayerComponent } from "./base";
 import { getMobilePlaybackTime } from "./mobile-playback-time";
@@ -71,6 +72,17 @@ async function waitForHelper(timeoutMs = 30_000) {
   return false;
 }
 
+async function ensureHelper() {
+  if (await helperReady()) return;
+  new Notice("请允许截图助手运行；授权会持续到通知栏中停止会话");
+  openHelperAuthorization();
+  if (!(await waitForHelper())) {
+    throw new Error("未检测到截图助手，请先安装辅助 APK 并允许录屏");
+  }
+  // Let Obsidian and the video surface finish drawing after returning.
+  await new Promise((resolve) => window.setTimeout(resolve, 700));
+}
+
 async function requestScreenPng(
   target: ReturnType<typeof getMobileScreenshotCropTarget>,
   recognizeTime: boolean,
@@ -112,6 +124,39 @@ async function requestScreenPng(
   };
 }
 
+async function requestSourceFrame(pageUrl: string, time: number) {
+  const response = await requestUrl({
+    url: helperUrl("/source-frame", {
+      url: pageUrl,
+      time: String(time),
+    }),
+    method: "GET",
+    throw: false,
+  });
+  if (response.status !== 200) {
+    const detail = response.json?.message;
+    throw new Error(
+      typeof detail === "string"
+        ? detail
+        : `截图助手返回 HTTP ${response.status}`,
+    );
+  }
+  const contentType = response.headers["content-type"] ?? "image/png";
+  return new Blob([response.arrayBuffer], { type: contentType });
+}
+
+function needsAccessibility(
+  capture: Awaited<ReturnType<typeof requestScreenPng>>,
+) {
+  if (capture.automation !== "accessibility-required") return false;
+  new Notice(
+    "请启用“Media Extended 自动显示视频进度”无障碍服务；返回 Obsidian 后再次截图即可全自动完成",
+    10_000,
+  );
+  openHelperAccessibilitySettings();
+  return true;
+}
+
 export async function captureWithAndroidHelper(
   view: PlayerComponent & ItemView,
 ) {
@@ -133,27 +178,12 @@ export async function captureWithAndroidHelper(
   }
 
   try {
-    if (!(await helperReady())) {
-      new Notice("请允许截图助手录制屏幕；授权会持续到通知栏中停止会话");
-      openHelperAuthorization();
-      if (!(await waitForHelper())) {
-        throw new Error("未检测到截图助手，请先安装辅助 APK 并允许录屏");
-      }
-      // Let Obsidian and the video surface finish drawing after returning.
-      await new Promise((resolve) => window.setTimeout(resolve, 700));
-    }
+    await ensureHelper();
 
     const settings = view.plugin.settings.getState();
     const playerTime = getMobilePlaybackTime(view.containerEl);
     const capture = await requestScreenPng(target, playerTime === null);
-    if (capture.automation === "accessibility-required") {
-      new Notice(
-        "请启用“Media Extended 自动显示视频进度”无障碍服务；返回 Obsidian 后再次截图即可全自动完成",
-        10_000,
-      );
-      openHelperAccessibilitySettings();
-      return;
-    }
+    if (needsAccessibility(capture)) return;
     const time =
       playerTime ??
       capture.detectedTime ??
@@ -172,6 +202,80 @@ export async function captureWithAndroidHelper(
     new Notice(
       "辅助截图失败：" +
         (error instanceof Error ? error.message : String(error)),
+    );
+  }
+}
+
+export async function captureSourceFrameWithAndroidHelper(
+  view: PlayerComponent & ItemView,
+) {
+  if (!Platform.isAndroidApp) return;
+  const media = view.getMediaInfo();
+  if (!media || isFileMediaInfo(media)) {
+    new Notice("高清源视频帧目前仅支持 YouTube 和哔哩哔哩链接");
+    return;
+  }
+  const target = getMobileScreenshotCropTarget(view.containerEl);
+  if (!target) {
+    new Notice("没有找到可裁剪的移动播放器");
+    return;
+  }
+  const targetNote = getMostRecentEditorLeaf(view.app);
+  if (!targetNote) {
+    new Notice("请先打开并聚焦一个可编辑的笔记标签页");
+    return;
+  }
+
+  let fallbackCapture: Awaited<ReturnType<typeof requestScreenPng>> | null =
+    null;
+  try {
+    await ensureHelper();
+    const playerTime = getMobilePlaybackTime(view.containerEl);
+    if (playerTime === null) {
+      fallbackCapture = await requestScreenPng(target, true);
+      if (needsAccessibility(fallbackCapture)) return;
+    }
+    const time =
+      playerTime ??
+      fallbackCapture?.detectedTime ??
+      (await promptMobileScreenshotTime(view.app));
+    if (time === null) return;
+
+    new Notice("正在解析视频源并提取高清帧，首次使用可能需要更长时间…", 8_000);
+    try {
+      const frame = await requestSourceFrame(media.jsonState.source, time);
+      await saveMobileScreenshot(view, targetNote, {
+        time,
+        blob: { arrayBuffer: await frame.arrayBuffer(), type: frame.type },
+      });
+      return;
+    } catch (sourceError) {
+      console.error("Failed to extract source video frame", sourceError);
+      new Notice(
+        "高清源帧提取失败，将自动使用屏幕截图：" +
+          (sourceError instanceof Error
+            ? sourceError.message
+            : String(sourceError)),
+        10_000,
+      );
+    }
+
+    const capture = fallbackCapture ?? (await requestScreenPng(target, false));
+    const settings = view.plugin.settings.getState();
+    const screenshot = await cropMobileScreenshot(
+      capture.image,
+      target,
+      time,
+      settings.screenshotFormat,
+      settings.screenshotQuality,
+    );
+    await saveMobileScreenshot(view, targetNote, screenshot);
+  } catch (error) {
+    console.error("Failed to capture source video frame", error);
+    new Notice(
+      "高清源帧截图失败：" +
+        (error instanceof Error ? error.message : String(error)),
+      10_000,
     );
   }
 }

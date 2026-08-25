@@ -5,18 +5,28 @@ plugins {
 dependencies {
     // Bundled so OCR also works on Android devices without Google Play Services.
     implementation "com.google.mlkit:text-recognition:16.0.1"
+    // On-device yt-dlp runtime, including the QuickJS challenge runtime used
+    // by current YouTube extractors. Frame decoding itself uses Android's
+    // MediaMetadataRetriever, so the much larger FFmpeg artifact isn't needed.
+    implementation "io.github.junkfood02.youtubedl-android:library:0.18.1"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.11.1"
+    testImplementation "junit:junit:4.13.2"
 }
 
 android {
     namespace "com.mediaextended.mobile.capture"
     compileSdk 36
 
+    packagingOptions {
+        jniLibs.useLegacyPackaging = true
+    }
+
     defaultConfig {
         applicationId "com.mediaextended.mobile.capture"
         minSdk 26
         targetSdk 36
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.0.4"
     }
 
     def releaseStore = System.getenv("ANDROID_KEYSTORE_PATH")

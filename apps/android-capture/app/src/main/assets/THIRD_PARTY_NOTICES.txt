@@ -1,0 +1,21 @@
+Media Extended Android Capture Helper — third-party notices
+
+youtubedl-android 0.18.1
+Copyright its contributors. Licensed under GNU GPL version 3.
+Source: https://github.com/yausername/youtubedl-android/tree/0.18.1
+License: https://www.gnu.org/licenses/gpl-3.0.txt
+
+yt-dlp
+Released under The Unlicense.
+Source: https://github.com/yt-dlp/yt-dlp
+
+QuickJS
+Copyright Fabrice Bellard and Charlie Gordon. Licensed under the MIT license.
+Source: https://bellard.org/quickjs/
+
+Python
+Copyright Python Software Foundation. Licensed under the PSF License Agreement.
+Source: https://www.python.org/
+
+The corresponding source for this helper is the media-extended-mobile repository
+and the dependency source links above. Each component retains its own license.

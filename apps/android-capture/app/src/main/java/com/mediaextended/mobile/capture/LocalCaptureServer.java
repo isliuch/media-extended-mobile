@@ -18,11 +18,13 @@ final class LocalCaptureServer {
     private final CaptureService service;
     private final ExecutorService clients = Executors.newCachedThreadPool();
     private final CaptureTimeRecognizer timeRecognizer = new CaptureTimeRecognizer();
+    private final SourceFrameExtractor sourceFrameExtractor;
     private ServerSocket socket;
     private Thread acceptThread;
 
     LocalCaptureServer(CaptureService service) {
         this.service = service;
+        sourceFrameExtractor = new SourceFrameExtractor(service);
     }
 
     void start() {
@@ -66,8 +68,25 @@ final class LocalCaptureServer {
             }
             if ("/status".equals(path)) {
                 String status = "{\"ready\":true,\"accessibilityReady\":"
-                    + PlayerControlAccessibilityService.isReady() + "}";
+                    + PlayerControlAccessibilityService.isReady()
+                    + ",\"sourceFrameSupported\":true}";
                 respond(output, 200, "application/json", status.getBytes(StandardCharsets.UTF_8));
+            } else if ("/source-frame".equals(path)) {
+                try {
+                    String pageUrl = query.get("url");
+                    double time = Double.parseDouble(query.getOrDefault("time", "-1"));
+                    byte[] png = sourceFrameExtractor.capture(pageUrl, time);
+                    respond(output, 200, "image/png", png, Math.round(time), "source-frame");
+                } catch (Exception error) {
+                    String message = safeError(error);
+                    respond(
+                        output,
+                        422,
+                        "application/json",
+                        ("{\"error\":\"source_frame_failed\",\"message\":\""
+                            + escapeJson(message) + "\"}").getBytes(StandardCharsets.UTF_8)
+                    );
+                }
             } else if ("/capture".equals(path)) {
                 byte[] png = service.capturePng();
                 Long time = null;
@@ -149,7 +168,7 @@ final class LocalCaptureServer {
         Long mediaTime,
         String automation
     ) throws IOException {
-        String reason = status == 200 ? "OK" : status == 204 ? "No Content" : status == 401 ? "Unauthorized" : "Not Found";
+        String reason = status == 200 ? "OK" : status == 204 ? "No Content" : status == 401 ? "Unauthorized" : status == 422 ? "Unprocessable Content" : "Not Found";
         String headers = "HTTP/1.1 " + status + " " + reason + "\r\n"
             + "Content-Type: " + type + "\r\n"
             + "Content-Length: " + body.length + "\r\n"
@@ -171,5 +190,21 @@ final class LocalCaptureServer {
         try { if (socket != null) socket.close(); } catch (IOException ignored) { }
         clients.shutdownNow();
         timeRecognizer.close();
+        sourceFrameExtractor.close();
+    }
+
+    private String safeError(Throwable error) {
+        String message = error.getMessage();
+        if (message == null || message.isEmpty()) message = error.getClass().getSimpleName();
+        if (message.length() > 240) message = message.substring(0, 240);
+        return message;
+    }
+
+    private String escapeJson(String value) {
+        return value
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\r", " ")
+            .replace("\n", " ");
     }
 }
