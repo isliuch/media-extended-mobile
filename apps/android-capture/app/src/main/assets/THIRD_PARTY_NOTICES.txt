@@ -5,6 +5,11 @@ Copyright its contributors. Licensed under GNU GPL version 3.
 Source: https://github.com/yausername/youtubedl-android/tree/0.18.1
 License: https://www.gnu.org/licenses/gpl-3.0.txt
 
+FFmpeg
+Copyright the FFmpeg developers. Licensed under GNU GPL version 3 in this build.
+Source: https://github.com/yausername/youtubedl-android/tree/0.18.1/ffmpeg
+Upstream: https://ffmpeg.org/
+
 yt-dlp
 Released under The Unlicense.
 Source: https://github.com/yt-dlp/yt-dlp

@@ -15,6 +15,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 
 - Fixed the Android “高清源视频帧” action not appearing because toolbar actions were registered before the remote media URL had loaded. The action is now registered independently of source loading and validates YouTube/Bilibili support when clicked.
+- Fixed repeated source-frame timeouts by replacing the permanently shared extraction queue with an isolated task per request and cleaning up orphaned yt-dlp/QuickJS processes after cancellation.
+- Replaced remote `MediaMetadataRetriever` seeking with a bounded FFmpeg process that performs fast input seeking and writes the requested source frame directly as PNG. Source resolution and frame extraction now have separate timeout messages.
+
+### Changed
+
+- The companion checks for a stable yt-dlp update at most once per day before resolving a source, while retaining the bundled copy when the update service is unavailable.
+- Increased the companion APK version to 1.0.5 (`versionCode` 6) and bundled FFmpeg 0.18.1. The universal APK is now about 215 MB because it includes FFmpeg for all supported Android ABIs.
 
 ## [3.3.0-mobile.11] - 2026-08-25
 

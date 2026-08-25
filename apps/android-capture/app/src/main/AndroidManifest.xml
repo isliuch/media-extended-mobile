@@ -7,6 +7,7 @@
 
     <application
         android:allowBackup="false"
+        android:extractNativeLibs="true"
         android:icon="@drawable/ic_launcher"
         android:label="Media Extended 截图助手"
         android:supportsRtl="true"
