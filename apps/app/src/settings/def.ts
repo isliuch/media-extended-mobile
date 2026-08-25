@@ -35,6 +35,7 @@ type MxSettingValues = {
   biliDefaultQuality: BilibiliQuality;
   screenshotFormat: "image/png" | "image/jpeg" | "image/webp";
   screenshotQuality?: number;
+  sourceFrameFallbackToScreenCapture: boolean;
   screenshotFolderPath?: string;
   subtitleFolderPath?: string;
 };
@@ -54,6 +55,7 @@ const settingKeys = enumerate<keyof MxSettingValues>()(
   "biliDefaultQuality",
   "screenshotFormat",
   "screenshotQuality",
+  "sourceFrameFallbackToScreenCapture",
   "enableSubtitle",
   "defaultLanguage",
   "screenshotFolderPath",
@@ -83,6 +85,7 @@ const mxSettingsDefault = {
   timestampOffset: 0,
   biliDefaultQuality: BilibiliQuality.FHD,
   screenshotFormat: "image/webp",
+  sourceFrameFallbackToScreenCapture: false,
   speedStep: 0.1,
 } satisfies MxSettingValues;
 
@@ -134,6 +137,7 @@ export type MxSettings = {
   setDefaultLanguage: (lang: string | null) => void;
   getDefaultLang(): string;
   setScreenshotQuality: (quality: number | null) => void;
+  setSourceFrameFallbackToScreenCapture: (enabled: boolean) => void;
   setTimestampOffset: (offset: number) => void;
   setInsertPosition: (pos: "before" | "after") => void;
   getUrlMappingData: () => MxSettingValues["urlMappingData"];
@@ -186,6 +190,10 @@ export function createSettingsStore(plugin: MxPlugin) {
     },
     setScreenshotQuality(quality) {
       set({ screenshotQuality: quality ?? undefined });
+      save(get());
+    },
+    setSourceFrameFallbackToScreenCapture(enabled) {
+      set({ sourceFrameFallbackToScreenCapture: enabled });
       save(get());
     },
     setDefaultLanguage(lang) {

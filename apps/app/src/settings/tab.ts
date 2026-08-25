@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { pathToFileURL } from "@/lib/file-url";
 import iso from "iso-639-1";
 import type { PaneType } from "obsidian";
 import {
@@ -9,6 +8,7 @@ import {
   Menu,
   Platform,
 } from "obsidian";
+import { pathToFileURL } from "@/lib/file-url";
 import { getGroupedLangExtra } from "@/lib/lang/lang";
 import { showAtButton } from "@/lib/menu";
 import { getDialog } from "@/lib/require";
@@ -488,6 +488,18 @@ export class MxSettingTabs extends PluginSettingTab {
     const { containerEl: container } = this;
 
     new Setting(container).setHeading().setName("Screenshot");
+
+    if (Platform.isAndroidApp)
+      new Setting(container)
+        .setName("高清源帧失败时自动回退")
+        .setDesc(
+          "开启后，高清源视频帧超时或解析失败时自动改用屏幕截图；默认关闭，可自行点击“辅助 APK 一键截图”。",
+        )
+        .addToggle((toggle) =>
+          toggle
+            .setValue(this.state.sourceFrameFallbackToScreenCapture)
+            .onChange(this.state.setSourceFrameFallbackToScreenCapture),
+        );
 
     new Setting(container)
       .setName("Screenshot linktext template")

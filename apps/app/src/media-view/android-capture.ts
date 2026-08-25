@@ -251,11 +251,20 @@ export async function captureSourceFrameWithAndroidHelper(
       return;
     } catch (sourceError) {
       console.error("Failed to extract source video frame", sourceError);
+      const detail =
+        sourceError instanceof Error
+          ? sourceError.message
+          : String(sourceError);
+      const settings = view.plugin.settings.getState();
+      if (!settings.sourceFrameFallbackToScreenCapture) {
+        new Notice(
+          `高清源帧提取失败：${detail}。可自行点击“辅助 APK 一键截图”`,
+          10_000,
+        );
+        return;
+      }
       new Notice(
-        "高清源帧提取失败，将自动使用屏幕截图：" +
-          (sourceError instanceof Error
-            ? sourceError.message
-            : String(sourceError)),
+        "高清源帧提取失败，将按设置自动使用屏幕截图：" + detail,
         10_000,
       );
     }

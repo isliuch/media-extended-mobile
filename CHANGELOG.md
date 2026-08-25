@@ -6,13 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.3.0-mobile.12] - 2026-08-25
+
+### Added
+
+- Added an Android setting controlling whether a failed or timed-out high-quality source-frame capture automatically falls back to a screen capture. It is disabled by default so users can choose the separate screen-capture action themselves.
+
 ## [3.3.0-mobile.11] - 2026-08-25
 
 ### Added
 
 - Added a separate Android “高清源视频帧” action for YouTube and Bilibili. The companion resolves an H.264/MP4 source stream with yt-dlp and decodes the requested frame as a lossless PNG instead of saving the displayed screen pixels.
 - YouTube uses its live IFrame playback time; Bilibili reuses the existing on-device control-bar OCR before requesting the source frame.
-- Source extraction is restricted to YouTube/Bilibili hosts, has a 75-second hard timeout, and automatically falls back to the existing cropped screen capture when extraction or device decoding fails.
+- Source extraction is restricted to YouTube/Bilibili hosts and has a 75-second hard timeout.
 
 ### Changed
 
