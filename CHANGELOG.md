@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Added an Android setting controlling whether a failed or timed-out high-quality source-frame capture automatically falls back to a screen capture. It is disabled by default so users can choose the separate screen-capture action themselves.
 
+### Fixed
+
+- Fixed the Android “高清源视频帧” action not appearing because toolbar actions were registered before the remote media URL had loaded. The action is now registered independently of source loading and validates YouTube/Bilibili support when clicked.
+
 ## [3.3.0-mobile.11] - 2026-08-25
 
 ### Added

@@ -15,8 +15,7 @@ import { toURL } from "@/lib/url";
 import { saveScreenshot } from "@/media-note/timestamp/screenshot";
 import { takeTimestamp } from "@/media-note/timestamp/timestamp";
 import type MediaExtended from "@/mx-main";
-import { isFileMediaInfo, type MediaInfo } from "../info/media-info";
-import { MediaHost } from "../info/supported";
+import type { MediaInfo } from "../info/media-info";
 import {
   captureSourceFrameWithAndroidHelper,
   captureWithAndroidHelper,
@@ -92,15 +91,9 @@ export function addAction(player: PlayerComponent & ItemView) {
       player.addAction("scan", "辅助 APK 一键截图", () =>
         captureWithAndroidHelper(player),
       );
-      const media = player.getMediaInfo();
-      if (
-        media &&
-        !isFileMediaInfo(media) &&
-        (media.type === MediaHost.YouTube || media.type === MediaHost.Bilibili)
-      )
-        player.addAction("focus", "高清源视频帧", () =>
-          captureSourceFrameWithAndroidHelper(player),
-        );
+      player.addAction("focus", "高清源视频帧", () =>
+        captureSourceFrameWithAndroidHelper(player),
+      );
     }
   }
 }

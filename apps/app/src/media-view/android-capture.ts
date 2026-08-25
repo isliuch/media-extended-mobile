@@ -1,5 +1,6 @@
 import { Notice, Platform, requestUrl, type ItemView } from "obsidian";
 import { isFileMediaInfo } from "@/info/media-info";
+import { MediaHost } from "@/info/supported";
 import { getMostRecentEditorLeaf } from "@/media-note/active-editor";
 import type { PlayerComponent } from "./base";
 import { getMobilePlaybackTime } from "./mobile-playback-time";
@@ -211,7 +212,11 @@ export async function captureSourceFrameWithAndroidHelper(
 ) {
   if (!Platform.isAndroidApp) return;
   const media = view.getMediaInfo();
-  if (!media || isFileMediaInfo(media)) {
+  if (
+    !media ||
+    isFileMediaInfo(media) ||
+    (media.type !== MediaHost.YouTube && media.type !== MediaHost.Bilibili)
+  ) {
     new Notice("高清源视频帧目前仅支持 YouTube 和哔哩哔哩链接");
     return;
   }
