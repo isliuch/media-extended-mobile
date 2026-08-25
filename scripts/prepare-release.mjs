@@ -3,7 +3,13 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const dist = resolve(root, "apps/app/dist");
-const manifest = JSON.parse(await readFile(resolve(dist, "manifest.json"), "utf8"));
+const sourceManifestPath = resolve(root, "apps/app/manifest.json");
+const distManifestPath = resolve(dist, "manifest.json");
+// esbuild emits main.js/styles.css but does not copy the source manifest.
+// Always synchronize it before preparing the root release bundle so CI cannot
+// accidentally publish a stale version from a previous local build.
+await copyFile(sourceManifestPath, distManifestPath);
+const manifest = JSON.parse(await readFile(sourceManifestPath, "utf8"));
 
 if (manifest.isDesktopOnly !== false) {
   throw new Error("Mobile release manifest must set isDesktopOnly to false");
